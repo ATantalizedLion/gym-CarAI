@@ -28,9 +28,11 @@ class SimpleCarAIEnv(gym.Env):
         self.main_batch = pyglet.graphics.Batch()
         self.track_batch = pyglet.graphics.Batch()
         self.debug_batch = pyglet.graphics.Batch()
+
         # Labels for score and level, scaled based upon score label font size
         self.score = 0
         self.t = 0
+        self.episode = 0
 
         self.done = 0
         self.reward = 0
@@ -39,9 +41,11 @@ class SimpleCarAIEnv(gym.Env):
         self.score_label = None
         self.track_label = None
         self.time_label = None
+        self.episode_label = None
+
         self.action_space = spaces.Box(np.array([-1], dtype=np.float64),
                                        np.array([+1], dtype=np.float64),
-                                       dtype=np.float64)  # steer, gas, brake
+                                       dtype=np.float64)  # steering only
         self.track_name = 'simpleSquareTrack'
 
         # define functions
@@ -80,9 +84,9 @@ class SimpleCarAIEnv(gym.Env):
 
         for obj in self.checkpoints:
             for car_bumper in self.car_bumpers:
-                tf, _, _, _, _, _, _ = line_overlapping(car_bumper.line(), obj.line())
-                if tf:
-                    if obj.id == self.current_checkpoint:
+                if obj.id == self.current_checkpoint:
+                    tf, _, _, _, _, _, _ = line_overlapping(car_bumper.line(), obj.line())
+                    if tf:
                         self.current_checkpoint += 1
                         if self.current_checkpoint > len(self.checkpoints):
                             self.current_checkpoint -= len(self.checkpoints)
@@ -92,6 +96,7 @@ class SimpleCarAIEnv(gym.Env):
         self.observations = []
         for sensor in self.sensors:
             min_distance = sensor.sensor_range
+            dist = 900000
             col_loc = []
             for obj in self.walls:
                 tf, p, q, t, r, u, s = line_overlapping(sensor.line(), obj.line())
@@ -111,36 +116,38 @@ class SimpleCarAIEnv(gym.Env):
         self.reward = self.score
         if self.time_label:
             self.t += self.dt
-            self.time_label.text = "Current Time: " + str(round(self.t))
-        return self.observations, self.reward, self.done
+            self.time_label.text = "Current Episode Time: " + str(round(self.t))
+        return self.observations, self.reward, self.done, 'noinfo', self.viewer.Terminate
 
     def reset(self):
         self.score = 0
         self.current_checkpoint = 1
+        self.t = 0
         self.reward = 0
         self.done = 0
         for obj in self.envObjects:
             obj.reset()
+        if self.viewer:
+            self.episode_label.text = "Current episode:" + str(self.episode)
+        self.episode += 1
 
     def render(self, mode='human'):
         assert mode in ['human', 'rgb_array']
         if self.viewer is None:
             self.viewer = Viewer(window_h_size, window_v_size, False)
-            [self.score_label, self.track_label, self.time_label] = self.viewer.labels(36, self.score, self.track_name,
-                                                                                       self.t)
-            self.score_label.batch = self.main_batch
-            self.track_label.batch = self.main_batch
-            self.time_label.batch = self.main_batch
+            [self.score_label, self.track_label, self.time_label, self.episode_label] = \
+                self.viewer.labels(self.main_batch, 36, self.score, self.track_name, self.t, self.episode)
             # redefine draw event
             pyglet.gl.glClearColor(1, 1, 1, 1)  # white background
             self.viewer.toDraw = [self.track_batch, self.main_batch]
             if debug:
                 self.viewer.toDraw.append(self.debug_batch)
-        if mode == 'human':
-            self.viewer.render()
-        elif mode == 'rgb_array':
-            rgb = self.viewer.render(True)
-            return rgb
+        if self.viewer.is_open:
+            if mode == 'human':
+                self.viewer.render()
+            elif mode == 'rgb_array':
+                rgb = self.viewer.render(True)
+                return rgb
 
     def close(self):
         if self.viewer:
