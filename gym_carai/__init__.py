@@ -2,9 +2,9 @@ from gym.envs.registration import register
 
 register(
     id='carai-v0',
-    entry_point='gym_carai.envs:caraiEnv',
+    entry_point='gym_carai.envs:CarAIEnv',
 )
 register(
-    id='carai-extrahard-v0',
-    entry_point='gym_carai.envs:ExtraHardCarAIEnv',
+    id='carai-simple-v0',
+    entry_point='gym_carai.envs:SimpleCarAIEnv',
 )

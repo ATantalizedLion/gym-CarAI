@@ -43,7 +43,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/gym_carai/envs" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/test.py" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -53,6 +53,97 @@
       <recent name="C:\Users\Daan\Google Drive\Education\MSc\Q4\Bio-Inspired\gym-carai\gym_carai\envs" />
       <recent name="C:\Users\Daan\Google Drive\Education\MSc\Q4\Bio-Inspired\gym-carai\gym_carai" />
     </key>
+  </component>
+  <component name="RunManager" selected="Python.AIStuffs">
+    <configuration name="AIStuffs" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="gym-carai" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Daan\.conda\envs\Py37_AI\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/gym_carai/envs" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AIStuffs.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="gym-carai" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Daan\.conda\envs\Py37_AI\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="carai_env_test" type="PythonConfigurationType" factoryName="Python">
+      <module name="gym-carai" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Daan\.conda\envs\Py37_AI\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="raceTrack" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="gym-carai" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Daan\.conda\envs\Py37_AI\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/gym_carai/envs" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gym_carai/envs/raceTrack.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.AIStuffs" />
+      <item itemvalue="Python.carai_env_test" />
+      <item itemvalue="Python.raceTrack" />
+    </list>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -77,11 +168,78 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="1700" y="459" key="FileChooserDialogImpl" timestamp="1591478963477">
+    <state x="907" y="379" key="#Inspections" timestamp="1591629299676">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="1700" y="459" key="FileChooserDialogImpl/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591478963477" />
+    <state x="907" y="379" key="#Inspections/0.0.2560.1400@0.0.2560.1400" timestamp="1591629299676" />
+    <state x="1012" y="366" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1591651016517">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="319" y="289" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591482759415" />
+    <state x="1012" y="366" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1591651016517" />
+    <state x="1254" y="487" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1591480632074">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1254" y="487" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591480632074" />
+    <state x="1700" y="459" key="FileChooserDialogImpl" timestamp="1591512226739">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1700" y="459" key="FileChooserDialogImpl/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591480655663" />
+    <state x="1700" y="459" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1591512226739" />
+    <state width="2539" height="405" key="GridCell.Tab.0.bottom" timestamp="1591683890535">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1257" height="401" key="GridCell.Tab.0.bottom/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
+    <state width="2539" height="405" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1591683890535" />
+    <state width="2539" height="405" key="GridCell.Tab.0.center" timestamp="1591683890535">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1257" height="401" key="GridCell.Tab.0.center/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
+    <state width="2539" height="405" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1591683890535" />
+    <state width="2539" height="405" key="GridCell.Tab.0.left" timestamp="1591683890535">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1257" height="401" key="GridCell.Tab.0.left/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
+    <state width="2539" height="405" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1591683890535" />
+    <state width="2539" height="405" key="GridCell.Tab.0.right" timestamp="1591683890535">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1257" height="401" key="GridCell.Tab.0.right/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
+    <state width="2539" height="405" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1591683890535" />
+    <state width="1550" height="403" key="GridCell.Tab.1.bottom" timestamp="1591683890533">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1257" height="492" key="GridCell.Tab.1.bottom/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591482961169" />
+    <state width="1550" height="403" key="GridCell.Tab.1.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1591683890533" />
+    <state width="1550" height="403" key="GridCell.Tab.1.center" timestamp="1591683890533">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1257" height="492" key="GridCell.Tab.1.center/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591482961168" />
+    <state width="1550" height="403" key="GridCell.Tab.1.center/0.0.2560.1400@0.0.2560.1400" timestamp="1591683890533" />
+    <state width="1550" height="403" key="GridCell.Tab.1.left" timestamp="1591683890533">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1257" height="492" key="GridCell.Tab.1.left/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591482961168" />
+    <state width="1550" height="403" key="GridCell.Tab.1.left/0.0.2560.1400@0.0.2560.1400" timestamp="1591683890533" />
+    <state width="1550" height="403" key="GridCell.Tab.1.right" timestamp="1591683890533">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1257" height="492" key="GridCell.Tab.1.right/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591482961168" />
+    <state width="1550" height="403" key="GridCell.Tab.1.right/0.0.2560.1400@0.0.2560.1400" timestamp="1591683890533" />
+    <state x="1729" y="618" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1591630210069">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1729" y="618" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1400@0.0.2560.1400" timestamp="1591630210069" />
+    <state x="1416" y="27" width="976" height="965" key="dock-window-1" timestamp="1591519580746">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1416" y="27" width="976" height="965" key="dock-window-1/0.0.2560.1400@0.0.2560.1400" timestamp="1591519580746" />
+    <state x="312" y="321" width="672" height="678" key="search.everywhere.popup" timestamp="1591603424921">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="312" y="321" width="672" height="678" key="search.everywhere.popup/0.0.2560.1400@0.0.2560.1400" timestamp="1591603424921" />
   </component>
 </project>

@@ -14,7 +14,7 @@ window_v_size = 1080
 FPS = 60
 debug = 0
 
-class CarAIEnv(gym.Env):
+class SimpleCarAIEnv(gym.Env):
     metadata = {'render.modes': ['human'], 'video.frames_per_second': FPS}
 
     def __init__(self):
@@ -39,8 +39,8 @@ class CarAIEnv(gym.Env):
         self.score_label = None
         self.track_label = None
         self.time_label = None
-        self.action_space = spaces.Box(np.array([-1, 0, 0], dtype=np.float64),
-                                       np.array([+1, +1, +1], dtype=np.float64),
+        self.action_space = spaces.Box(np.array([-1], dtype=np.float64),
+                                       np.array([+1], dtype=np.float64),
                                        dtype=np.float64)  # steer, gas, brake
         self.track_name = 'simpleSquareTrack'
 
@@ -54,7 +54,7 @@ class CarAIEnv(gym.Env):
         for item in self.checkpoints:
             item.sprite.batch = self.track_batch
 
-        self.car_obj = Car(car_position, debug_batch=self.debug_batch)
+        self.car_obj = Car(car_position, debug_batch=self.debug_batch, mode='simple')
         self.car_obj.sprite.batch = self.main_batch
         self.car_bumpers = [self.car_obj.Bumper, self.car_obj.SideL, self.car_obj.SideR, self.car_obj.Rear]
 
@@ -71,6 +71,7 @@ class CarAIEnv(gym.Env):
             info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)"""
         for obj in self.envObjects:
             obj.update(self.dt, action)
+
         for obj in self.walls:
             for car_bumper in self.car_bumpers:
                 tf, _, _, _, _, _, _ = line_overlapping(car_bumper.line(), obj.line())
@@ -108,8 +109,9 @@ class CarAIEnv(gym.Env):
                 sensor.collision_marker.update_position([-50, -50])
                 self.observations.append(min_distance)  # front left rear right
         self.reward = self.score
-        self.t += self.dt
-        self.time_label.text = "Current Time: " + str(round(self.t))
+        if self.time_label:
+            self.t += self.dt
+            self.time_label.text = "Current Time: " + str(round(self.t))
         return self.observations, self.reward, self.done
 
     def reset(self):
@@ -123,7 +125,7 @@ class CarAIEnv(gym.Env):
     def render(self, mode='human'):
         assert mode in ['human', 'rgb_array']
         if self.viewer is None:
-            self.viewer = Viewer(window_h_size, window_v_size)
+            self.viewer = Viewer(window_h_size, window_v_size, False)
             [self.score_label, self.track_label, self.time_label] = self.viewer.labels(36, self.score, self.track_name,
                                                                                        self.t)
             self.score_label.batch = self.main_batch
@@ -134,7 +136,12 @@ class CarAIEnv(gym.Env):
             self.viewer.toDraw = [self.track_batch, self.main_batch]
             if debug:
                 self.viewer.toDraw.append(self.debug_batch)
-        self.viewer.render()
+        if mode == 'human':
+            self.viewer.render()
+        elif mode == 'rgb_array':
+            rgb = self.viewer.render(True)
+            return rgb
 
     def close(self):
-        self.viewer.close()
+        if self.viewer:
+            self.viewer.close()

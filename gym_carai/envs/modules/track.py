@@ -1,5 +1,5 @@
 import numpy as np
-from v1.game.util import Line
+from gym_carai.envs.modules.util import Line
 
 
 def read_track(filename):
@@ -29,6 +29,7 @@ class Checkpoint(Line):
         Checkpoint._counter += 1
         self.id = Checkpoint._counter
         self.score = score
+
 
 def generate_track(filename):
     track_objects = []
