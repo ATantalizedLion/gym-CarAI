@@ -37,7 +37,6 @@ class Viewer():
         return arr if return_rgb_array else self.is_open
 
     def window_closed(self):
-        Terminate = 1
         self.Terminate = 1
         self.close()
 

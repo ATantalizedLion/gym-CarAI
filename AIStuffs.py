@@ -4,41 +4,22 @@ from tensorflow.keras import layers
 import numpy as np
 import matplotlib.pyplot as plt
 
-tf.keras.backend.set_floatx('float64')
+
+# Set some TF settings to be more optimal.
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-(x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
+# Training walktrough
+print("TensorFlow version: {}".format(tf.__version__))
+print("Eager execution: {}".format(tf.executing_eagerly()))
 
-x_train, x_test = x_train / 255.0, x_test / 255.0
+train_dataset_url = "https://storage.googleapis.com/download.tensorflow.org/data/iris_training.csv"
 
+train_dataset_fp = tf.keras.utils.get_file(fname=os.path.basename(train_dataset_url),
+                                           origin=train_dataset_url)
 
+# 1 in, 1 out, 2 hidden layers with 10 neurons.
 model = tf.keras.Sequential([
-  tf.keras.layers.Flatten(input_shape=(28, 28)),
-  tf.keras.layers.Dense(128, activation='relu'),
-  tf.keras.layers.Dropout(0.2),
-  tf.keras.layers.Dense(10)
-    ])
-
-predictions = model(x_train[:1]).numpy()
-tf.nn.softmax(predictions).numpy()
-
-loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-
-loss_fn(y_train[:1], predictions).numpy()
-
-model.compile(optimizer='adam',
-              loss=loss_fn,
-              metrics=['accuracy'])
-
-model.fit(x_train, y_train, epochs=5)
-
-model.evaluate(x_test,  y_test, verbose=2)
-
-probability_model = tf.keras.Sequential([
-  model,
-  tf.keras.layers.Softmax()])
-
-probability_model(x_test[:5])
-
-model.pred
+  tf.keras.layers.Dense(10, activation=tf.nn.relu, input_shape=(1,)),  # input shape required
+  tf.keras.layers.Dense(10, activation=tf.nn.relu),
+  tf.keras.layers.Dense(1)
+])

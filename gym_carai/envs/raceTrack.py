@@ -12,7 +12,7 @@ pyglet.resource.reindex()
 windowHSize = 1920
 windowVSize = 1080
 score_label_font_size = 36
-track_name = 'simpleSquareTrack NoC'
+track_name = 'simpleSquareTrack'
 
 FPS = 60
 dt = 1 / FPS
@@ -37,12 +37,7 @@ track_label = pyglet.text.Label(text="Current Track:" + track_name,
                                 anchor_x='left', anchor_y='center',
                                 batch=main_batch,
                                 color=(100, 0, 100, 255))
-you_died = pyglet.text.Label(text="YOU DIED",
-                             font_name='Times New Roman',
-                             font_size=100,
-                             x=0.5 * windowHSize, y=windowVSize * 0.5,
-                             anchor_x='left', anchor_y='center',
-                             color=(255, 0, 0, 255))
+
 
 # define functions
 walls, checkpoints, car_position = generate_track('resources/' + track_name + '.csv')
@@ -98,7 +93,6 @@ def update(dt, action):
     for sensor in sensors:
         min_distance = 900000
         col_loc = []
-        print(sensor.line())
         for obj in walls:
             tf, p, q, t, r, u, s = line_overlapping(sensor.line(), obj.line())
             if tf:
@@ -111,7 +105,8 @@ def update(dt, action):
             sensor.collision_marker.y = col_loc[1]
         else:
             # no collision found, draw off-screen
-            sensor.collision_marker.update_position([-50, -50])
+            sensor.collision_marker.x = -50
+            sensor.collision_marker.y = -50
 
 
 @window.event

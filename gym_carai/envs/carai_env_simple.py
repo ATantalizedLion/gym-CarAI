@@ -11,18 +11,17 @@ from gym_carai.envs.modules.viewer import Viewer
 
 window_h_size = 1920
 window_v_size = 1080
-FPS = 60
 debug = 0
 
 class SimpleCarAIEnv(gym.Env):
-    metadata = {'render.modes': ['human'], 'video.frames_per_second': FPS}
+    metadata = {'render.modes': ['human'], 'video.frames_per_second': 30}
 
     def __init__(self):
         pyglet.resource.path = ['gym_carai/envs/resources']
         pyglet.resource.reindex()
         score_label_font_size = 36
-        self.dt = 1 / FPS
         self.viewer = None
+        self.Terminate = False
 
         # 3 batches, one for car, one for obstacles, one for debug features
         self.main_batch = pyglet.graphics.Batch()
@@ -36,7 +35,7 @@ class SimpleCarAIEnv(gym.Env):
 
         self.done = 0
         self.reward = 0
-        self.observations = None
+        self.observations = np.array([1])
 
         self.score_label = None
         self.track_label = None
@@ -65,16 +64,17 @@ class SimpleCarAIEnv(gym.Env):
         # all objects requiring .update()
         self.envObjects = [self.car_obj]
 
-        self.sensors = [self.car_obj.FrontDistanceSensor, self.car_obj.RightDistanceSensor,
-                        self.car_obj.RearDistanceSensor, self.car_obj.LeftDistanceSensor]
+        # self.sensors = [self.car_obj.FrontDistanceSensor, self.car_obj.RightDistanceSensor,
+        #                 self.car_obj.RearDistanceSensor, self.car_obj.LeftDistanceSensor]
+        self.sensors = [self.car_obj.RightDistanceSensor]
 
-    def step(self, action):
+    def step(self, action, dt):
         """"observation (object): agent's observation of the current environment
             reward (float) : amount of reward returned after previous action
             done (bool): whether the episode has ended, in which case further step() calls will return undefined results
             info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)"""
         for obj in self.envObjects:
-            obj.update(self.dt, action)
+            obj.update(dt, action)
 
         for obj in self.walls:
             for car_bumper in self.car_bumpers:
@@ -93,10 +93,10 @@ class SimpleCarAIEnv(gym.Env):
                         self.score += obj.score
                         self.score_label.text = "Current Score: " + str(self.score)
 
-        self.observations = []
+        current_sensor_number = 0
         for sensor in self.sensors:
             min_distance = sensor.sensor_range
-            dist = 900000
+            dist = min_distance
             col_loc = []
             for obj in self.walls:
                 tf, p, q, t, r, u, s = line_overlapping(sensor.line(), obj.line())
@@ -108,16 +108,19 @@ class SimpleCarAIEnv(gym.Env):
             if dist < 900000:
                 sensor.collision_marker.x = col_loc[0]
                 sensor.collision_marker.y = col_loc[1]
-                self.observations.append(min_distance)
             else:
                 # no collision found, draw off-screen
-                sensor.collision_marker.update_position([-50, -50])
-                self.observations.append(min_distance)  # front left rear right
+                sensor.collision_marker.x = -50
+                sensor.collision_marker.y = -50
+            self.observations[current_sensor_number] = min_distance
         self.reward = self.score
+        self.t += dt
         if self.time_label:
-            self.t += self.dt
             self.time_label.text = "Current Episode Time: " + str(round(self.t))
-        return self.observations, self.reward, self.done, 'noinfo', self.viewer.Terminate
+        if self.viewer:
+            if not self.Terminate:
+                self.Terminate = self.viewer.Terminate
+        return self.observations, self.reward, self.done, {'t': self.t}, self.Terminate
 
     def reset(self):
         self.score = 0
