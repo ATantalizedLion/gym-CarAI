@@ -75,8 +75,8 @@ def get_loss(model, memory, done, gamma=0.99):
 
     total_loss = tf.reduce_mean((0.5 * critic_loss + actor_loss))
 
-    print("critic loss -- %s" % (critic_loss.numpy()))
-    print("actor loss -- %s" % (actor_loss.numpy()))
+    print("critic loss -- %s" % (tf.reduce_mean(critic_loss).numpy()))
+    print("actor loss -- %s" % (tf.reduce_mean(actor_loss).numpy()))
     print("total loss -- %s" % (total_loss.numpy()))
     return total_loss
 

@@ -143,7 +143,7 @@ class SimpleCarAIEnv(gym.Env):
         if self.viewer:
             if not self.Terminate:
                 self.Terminate = self.viewer.Terminate
-        self.reward = self.score #- 0.01*self.t
+        self.reward = self.score + 0.01*self.t
         if self.done:
             self.reward += -25  # penalty for hitting wall
         return self.observations, self.reward, self.done, {'t': self.t}, self.Terminate  # , 'JStar': self.JStar
@@ -158,6 +158,7 @@ class SimpleCarAIEnv(gym.Env):
             obj.reset()
         if self.viewer:
             self.episode_label.text = "Current episode:" + str(self.episode)
+            self.score_label.text = "Current Score: " + str(self.score)
         self.episode += 1
 
     def render(self, mode='human'):
