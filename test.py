@@ -2,133 +2,139 @@ import gym
 import gym_carai
 import time
 import numpy as np
-import matplotlib.pyplot as plt
 import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # this line forces to run on CPU
 import tensorflow as tf
+# print(tf.config.experimental.list_physical_devices('GPU') )  # show all gpus
+# print(tf.__version__)  # show tf version
 
 
-# from tensorflow.python.client import device_lib
-# device_name = [x.name for x in device_lib.list_local_devices() if x.device_type == 'GPU']
-# if device_name[0] == "/device:GPU:0":
-#     device_name = "/gpu:0"
-#     print('GPU')
-# else:
-#     device_name = "/cpu:0"
-#     print('CPU')
-physical_devices = tf.config.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(physical_devices[0], True)
+class Memory:
+    def __init__(self):
+        self.states = []
+        self.actions = []
+        self.rewards = []
+
+    def store(self, state, action, reward):
+        self.states.append(state)
+        self.actions.append(action)
+        self.rewards.append(reward)
+
+    def clear(self):
+        self.states = []
+        self.actions = []
+        self.rewards = []
 
 
-'''
-# J(t) = r(t+1) + gamma J(t+1)
-# TD = r(t+1) + gamma J(t+1) - J(t)
-# get Temporal Difference to zero
+class ActorCriticModel(tf.keras.Model):
+    def __init__(self, learning_rate):
+        super(ActorCriticModel, self).__init__()
+
+        # actor part of Model (policies)
+        self.inner1 = tf.keras.layers.Dense(200, activation='relu')
+        self.turning_logits = tf.keras.layers.Dense(3)  # 3 logits for turning policy: left/straight/right
+
+        # critic part of model (value function)
+        self.inner2 = tf.keras.layers.Dense(200, activation='relu')
+        self.value = tf.keras.layers.Dense(1)  # condense back into 1
+
+        self.opt = tf.compat.v1.train.AdamOptimizer(learning_rate, use_locking=True)
+
+    def call(self, inputs):
+        x = self.inner1(inputs)
+        logits = self.turning_logits(x)
+        v1 = self.inner2(inputs)
+        J  = self.value(v1)
+        return logits, J
+
+def get_loss(model, memory, done, gamma=0.99):
+
+    # continous version of Belmann:
+    reward_sum = 0
+    discounted_rewards = []
+    for reward in memory.rewards[::-1]:
+        reward_sum = reward + gamma * reward_sum
+        discounted_rewards.append(reward_sum)
+    discounted_rewards = discounted_rewards[::-1]
+
+    # get J for each timestep
+    logits, values = model(tf.convert_to_tensor(np.vstack(memory.states), dtype=tf.float32))
+    advantage = tf.convert_to_tensor(np.array(discounted_rewards)[:, None],
+                                     dtype=tf.float32) - values
+
+    critic_loss = (advantage) ** 2
+
+    # actor Loss:
+
+    policy = tf.nn.softmax(logits)
+    entropy = tf.nn.softmax_cross_entropy_with_logits(labels=policy, logits=logits)
+    actor_loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=memory.actions, logits=logits)
+    actor_loss *= tf.stop_gradient(advantage)
+
+    actor_loss -= 0.01 * entropy
+
+    total_loss = tf.reduce_mean((0.5 * critic_loss + actor_loss))
+
+    print("critic loss -- %s" % (critic_loss.numpy()))
+    print("actor loss -- %s" % (actor_loss.numpy()))
+    print("total loss -- %s" % (total_loss.numpy()))
+    return total_loss
 
 
-# ADHDP Action Dependend Heuristic Dynamic Programming
-# give u to critic, since plant not known. Otherwise
-#           back propagation through plant, which is not known!
-# update (both!) neural network weights based upon effect on error
-#       gradient for a weight change.
-
-
-# J* would be path length / velocity
-# Watch Neural network lecture again!
-
-
-# Set up the models
-
-
-
-
-# u = steering direction [-1 to 1]
-# x = distance to wall right side
-'''
-
-# Plant NN:
-# Find x from state u
-
-# Critic, task is to find J from state u
-# e_c (t) = J(t-1) - [gamma*J(t)-r(t)]
-# E_c = 0.5*e_c^2
-# if r(x) < 0 all x, then J*=0    #r(x) = reward
-
-
-# Actor, task is to reach a goal value J*
-# e_a (t) = J(t) - J^*(t)     - J* = max value
-# E_a = 0.5*e_c^2
-# if r(x) < 0 all x, then J*=0
-# J* difficult to find.
-# Give all negative rewards, then you know J* = 0
-
-u_size = 1
-x_size = 1
-
-# Actor
-# x in, u out, 2 hidden layers with 10 neurons.
-
-'''
-# Critic
-# x in, estimated J out, 2 hidden layers with 10 neurons.
-critic = tf.keras.Sequential([
-  tf.keras.layers.Dense(10, activation=tf.nn.relu, input_shape=(x_size,)),  # input shape required
-  tf.keras.layers.Dense(10, activation=tf.nn.relu),
-  tf.keras.layers.Dense(u_size)
-])
-# Plant NN
-# u in, estimated x out,  2 hidden layers with 10 neurons.
-plant = tf.keras.Sequential([
-  tf.keras.layers.Dense(10, activation=tf.nn.relu, input_shape=(u_size,)),  # input shape required
-  tf.keras.layers.Dense(10, activation=tf.nn.relu),
-  tf.keras.layers.Dense(x_size)
-])
-'''
-
-# compile models
-
-inputs = tf.keras.Input(shape=(1,))
-x = tf.keras.layers.Dense(5, activation=tf.nn.relu)(inputs)
-outputs = tf.keras.layers.Dense(1, activation=tf.nn.softmax)(x)
-actor = tf.keras.Model(inputs=inputs, outputs=outputs)
-
-actor.compile()
-actor.summary()
-
-modelinput = np.array([1])
-print(actor.predict(modelinput))
-
-
-# Start training
-env = gym.make('carai-simple-v0')  # First open environment
-start_time = time.time()  # Register current time
-ep = 1  # Current episode
-maxSteps = 10000  # max duration epoch
-dt = 1/60
-
-
+# Setup for training etc.
+env = gym.make('carai-simple-v0')  # First open the environment
+start_time = time.time()           # Register current time
+epoch = 1                          # Current episode
+maxEpoch = 100                     # max amount of epochs
+maxEpochTime = 50                  # [s] max seconds to spend per epoch
+dt = 1/60                          # fps (should equal monitor refresh rate)
+maxSteps = int(maxEpochTime/dt)    # max duration of an epoch
+Terminate = None
+done = 0
+learning_rate = 0.0001
+mem = Memory()
 run = True
+
+
+Model = ActorCriticModel(learning_rate)  # global network
+Model(tf.convert_to_tensor(np.random.random((1, 1)), dtype=tf.float32))
+
 while run:
-    print("--- starting run %s ---" % ep)
+    print("--- starting run %s ---" % epoch)
     run_time = time.time()
     env.reset()
-    obs = np.array([40])
-    for i in range(10000):
-        # env.render('human')
-        action = actor.predict(obs)
-        action = action[0]
-        obs, rewards, done, info_dict, Terminate = env.step(action, dt)  # take a random action
+    mem.clear()
+
+    # initial values
+    obs = np.array([[500]])
+    epoch_loss = 0
+
+    for i in range(maxSteps):
+        # calculate next step
+        env.render('human')  # manual, human, rgb_array
+
+        logits, _ = Model(obs)
+        probs = tf.nn.softmax(logits)
+        action = np.array([np.random.choice(3, p=probs.numpy()[0])])  # returns 0,1,2, action space = -1 to 1
+        obs, reward, done, info_dict, Terminate = env.step(action, dt)
+        mem.store(obs, action[0], reward)
         if Terminate:  # Window was closed.
+            epoch = maxEpoch*2
             run = False
-            break
         if done:
             break
-    ep += 1
-    print("--- %s seconds ---" % (time.time() - run_time))
     if not Terminate:
-        '''Process epoch here'''
-        t = 1
+        # GradientTape tracks the gradient of all variables within scope
+        with tf.GradientTape() as tape:
+            total_loss = get_loss(Model, mem, done)
+        epoch_loss += total_loss
+        # Apply found gradients to model
+        grads = tape.gradient(total_loss, Model.trainable_weights)
+        Model.opt.apply_gradients(zip(grads, Model.trainable_weights))
+    print("--- %s seconds ---" % (time.time() - run_time))
+
+    epoch += 1
+
 env.close()
 print("--- total %s seconds ---" % (time.time() - start_time))
 

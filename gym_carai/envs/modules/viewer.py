@@ -3,7 +3,7 @@ import numpy as np
 
 class Viewer():
     # TODO: Optimize rendering geometry (draw open GL shapes?)
-    def __init__(self, width, height, openWin=True):
+    def __init__(self, width, height, manualControl=False):
         self.width = width
         self.height = height
         self.window = pyglet.window.Window(width=self.width, height=self.height)
@@ -21,8 +21,8 @@ class Viewer():
         self.window.clear()
         self.window.dispatch_events()
         # self.transform.enable()
-        for obj in self.toDraw:
-            obj.draw()
+        for batch in self.toDraw:
+            batch.draw()
 
         # write rgb array as in classic control framework
         arr = None

@@ -3,15 +3,16 @@ from gym import error, spaces, utils
 from gym.utils import seeding
 import pyglet
 import numpy as np
-
 from gym_carai.envs.modules.track import generate_track
 from gym_carai.envs.modules.car import Car
 from gym_carai.envs.modules.util import line_overlapping, vector_length
 from gym_carai.envs.modules.viewer import Viewer
 
+pyglet.options['debug_gl'] = False  # performance increase
 window_h_size = 1920
 window_v_size = 1080
 debug = 0
+
 
 class SimpleCarAIEnv(gym.Env):
     metadata = {'render.modes': ['human'], 'video.frames_per_second': 30}
@@ -22,6 +23,8 @@ class SimpleCarAIEnv(gym.Env):
         score_label_font_size = 36
         self.viewer = None
         self.Terminate = False
+        self.manual = None
+        self.keys = None
 
         # 3 batches, one for car, one for obstacles, one for debug features
         self.main_batch = pyglet.graphics.Batch()
@@ -35,7 +38,8 @@ class SimpleCarAIEnv(gym.Env):
 
         self.done = 0
         self.reward = 0
-        self.observations = np.array([1])
+        self.JStar = 0
+        self.observations = np.array([[0]])
 
         self.score_label = None
         self.track_label = None
@@ -46,6 +50,7 @@ class SimpleCarAIEnv(gym.Env):
                                        np.array([+1], dtype=np.float64),
                                        dtype=np.float64)  # steering only
         self.track_name = 'simpleSquareTrack'
+        self.track_name = 'simpleSquareTrackTighter'
 
         # define functions
         self.walls, self.checkpoints, car_position = generate_track(
@@ -73,6 +78,25 @@ class SimpleCarAIEnv(gym.Env):
             reward (float) : amount of reward returned after previous action
             done (bool): whether the episode has ended, in which case further step() calls will return undefined results
             info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)"""
+        if self.manual:
+            if self.keys[pyglet.window.key.LEFT] == 1:
+                if self.keys[pyglet.window.key.RIGHT] == 1:
+                    action[0] = 0
+                else:
+                    action[0] = -1
+            elif self.keys[pyglet.window.key.RIGHT] == 1:
+                action[0] = 1
+            else:
+                action[0] = 0
+            # if self.keys[pyglet.window.key.UP] == 1:
+            #     action[1] = 1
+            # else:
+            #     action[1] = 0
+            # if self.keys[pyglet.window.key.DOWN] == 1:
+            #     action[2] = 1
+            # else:
+            #     action[2] = 0
+
         for obj in self.envObjects:
             obj.update(dt, action)
 
@@ -113,14 +137,16 @@ class SimpleCarAIEnv(gym.Env):
                 sensor.collision_marker.x = -50
                 sensor.collision_marker.y = -50
             self.observations[current_sensor_number] = min_distance
-        self.reward = self.score
         self.t += dt
         if self.time_label:
             self.time_label.text = "Current Episode Time: " + str(round(self.t))
         if self.viewer:
             if not self.Terminate:
                 self.Terminate = self.viewer.Terminate
-        return self.observations, self.reward, self.done, {'t': self.t}, self.Terminate
+        self.reward = self.score #- 0.01*self.t
+        if self.done:
+            self.reward += -25  # penalty for hitting wall
+        return self.observations, self.reward, self.done, {'t': self.t}, self.Terminate  # , 'JStar': self.JStar
 
     def reset(self):
         self.score = 0
@@ -135,9 +161,11 @@ class SimpleCarAIEnv(gym.Env):
         self.episode += 1
 
     def render(self, mode='human'):
-        assert mode in ['human', 'rgb_array']
+        assert mode in ['human', 'rgb_array', 'manual']
+        if mode == 'manual':
+            self.manual = 1
         if self.viewer is None:
-            self.viewer = Viewer(window_h_size, window_v_size, False)
+            self.viewer = Viewer(window_h_size, window_v_size, self.manual)
             [self.score_label, self.track_label, self.time_label, self.episode_label] = \
                 self.viewer.labels(self.main_batch, 36, self.score, self.track_name, self.t, self.episode)
             # redefine draw event
@@ -145,12 +173,16 @@ class SimpleCarAIEnv(gym.Env):
             self.viewer.toDraw = [self.track_batch, self.main_batch]
             if debug:
                 self.viewer.toDraw.append(self.debug_batch)
+            if self.manual:
+                self.keys = pyglet.window.key.KeyStateHandler()
         if self.viewer.is_open:
-            if mode == 'human':
+            if mode == 'human' or mode == 'manual':
                 self.viewer.render()
             elif mode == 'rgb_array':
                 rgb = self.viewer.render(True)
                 return rgb
+        if mode == 'manual':
+            self.viewer.window.push_handlers(self.keys)
 
     def close(self):
         if self.viewer:

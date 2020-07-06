@@ -63,7 +63,7 @@ def line_overlapping(line1, line2):
 
 
 class Line:
-     # TODO: Somehow render with openGL instead of using a png.
+     # TODO: Somehow render with openGL instead of using a png. (Also means wheels :)
     def __init__(self, pos, height=4):
         # Load Pos Data
         self.x1 = pos[0]

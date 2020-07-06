@@ -41,5 +41,5 @@ def generate_track(filename):
         elif track_data[i, 0] == 1:
             checkpoints.append(Checkpoint(track_data[i, 1:5], track_data[i, 5]))
         elif track_data[i, 0] == -1:
-            car_position = (track_data[i, 1:3])
+            car_position = (track_data[i, 1:4]) # x, y, rotation
     return track_objects, checkpoints, car_position

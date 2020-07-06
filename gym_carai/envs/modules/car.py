@@ -23,7 +23,7 @@ class Sensor(Line):
         self.sensor_range = sensor_range
 
 class Car:
-    def __init__(self, initial_position=(100, 100), car_length=64, main_batch=[], debug_batch=[], mode=[]):
+    def __init__(self, initial_position=(100, 100, 0), car_length=64, main_batch=[], debug_batch=[], mode=[]):
         self.debug_batch = debug_batch
         self.image = pyglet.resource.image("car.png")
         center_image(self.image)
@@ -37,9 +37,10 @@ class Car:
         self.sprite.scale = car_length / self.image.height
         self.width = self.sprite.width
         self.height = self.sprite.height
-        self.rotation = 0.0
+        self.rotation = initial_position[2]
         self.rotation_rad = np.deg2rad(self.rotation)
-        self.vel = 0.0
+        self.sprite.rotation = self.rotation
+        self.vel = 60.0
         self.acc = 0.0
 
         self.mode = mode
@@ -79,12 +80,15 @@ class Car:
         """"
         action [0] = -1 to 1, steering
         action [1] = -1 to 1, gas
-        action [2] = brake
+        action [2] = brake (bool)
         """
         if self.mode == 'simple':
-            self.rotation += action[0] * self.rotate_speed * dt
-            self.vel = 20
+            rot = action[0]-1
+            self.rotation += rot * self.rotate_speed * dt
+            self.vel = 90
         else:
+            if abs(action[1]) > 1:
+                action[1] = action[1]/abs(action[1])
             self.rotation += action[0] * self.rotate_speed * dt
             self.vel += self.acc_speed * dt * action[1]
             if self.vel > 0.0:
@@ -140,7 +144,7 @@ class Car:
         self.xc = self.x
         self.yc = self.y
         self.c = np.array([self.xc, self.yc])
-        self.rotation = 0.0
+        self.rotation = self.initPos[2]
         self.rotation_rad = np.deg2rad(self.rotation)
         self.vel = 0.0
         self.acc = 0.0
