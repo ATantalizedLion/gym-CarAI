@@ -45,6 +45,7 @@ class ActorCriticModel(keras.Model):
 
   def call(self, inputs):
     # Forward pass
+    print(inputs)
     x = self.dense1(inputs)
     logits = self.policy_logits(x)
     v1 = self.dense2(inputs)
@@ -323,17 +324,13 @@ class Worker(threading.Thread):
     if done:
       reward_sum = 0.  # terminal
     else:
-      reward_sum = self.local_model(
-          tf.convert_to_tensor(new_state[None, :],
-                               dtype=tf.float32))[-1].numpy()[0]
-
+      reward_sum = self.local_model(tf.convert_to_tensor(new_state[None, :],dtype=tf.float32))[-1].numpy()[0]
     # Get discounted rewards
     discounted_rewards = []
     for reward in memory.rewards[::-1]:  # reverse buffer r
       reward_sum = reward + gamma * reward_sum
       discounted_rewards.append(reward_sum)
     discounted_rewards.reverse()
-
     logits, values = self.local_model(
         tf.convert_to_tensor(np.vstack(memory.states),
                              dtype=tf.float32))
@@ -346,8 +343,6 @@ class Worker(threading.Thread):
     # Calculate our policy loss
     policy = tf.nn.softmax(logits)
     entropy = tf.nn.softmax_cross_entropy_with_logits(labels=policy, logits=logits)
-    print(logits)
-    print(memory.actions)
 
     policy_loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=memory.actions,
                                                                  logits=logits)

@@ -1,0 +1,23 @@
+
+
+class PlantError(tf.keras.losses.Loss):
+    def __init__(self, name="PlantError"):
+        super().__init__(name=name)
+
+    def call(self, y_true, y_pred):
+        return 0.5*(tf.square(y_true - y_pred))
+
+
+# Plant NN
+plantInput = tf.keras.Input(shape=(1,))
+plantInner1 = tf.keras.layers.Dense(6, activation=tf.nn.relu)(plantInput)
+plantOutput = tf.keras.layers.Dense(1, activation=tf.nn.relu)(plantInner1)
+plant = tf.keras.Model(inputs=plantInput, outputs=plantOutput)
+plant.compile(
+    optimizer=tf.keras.optimizers.RMSprop(),  # Optimizer
+    # Loss function to minimize
+    loss=PlantError(),
+    # List of metrics to monitor
+    metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
+)
+

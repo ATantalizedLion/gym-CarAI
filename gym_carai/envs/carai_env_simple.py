@@ -39,7 +39,7 @@ class SimpleCarAIEnv(gym.Env):
         self.done = 0
         self.reward = 0
         self.JStar = 0
-        self.observations = np.array([[0]])
+        self.observations = np.array([[0, 0]])
 
         self.score_label = None
         self.track_label = None
@@ -49,6 +49,11 @@ class SimpleCarAIEnv(gym.Env):
         self.action_space = spaces.Box(np.array([-1], dtype=np.float64),
                                        np.array([+1], dtype=np.float64),
                                        dtype=np.float64)  # steering only
+
+        self.observation_space = spaces.Box(np.array([0, 0]),
+                                            np.array([600, 600]),
+                                            dtype=np.float32)
+
         self.track_name = 'simpleSquareTrack'
         self.track_name = 'simpleSquareTrackTighter'
 
@@ -71,7 +76,7 @@ class SimpleCarAIEnv(gym.Env):
 
         # self.sensors = [self.car_obj.FrontDistanceSensor, self.car_obj.RightDistanceSensor,
         #                 self.car_obj.RearDistanceSensor, self.car_obj.LeftDistanceSensor]
-        self.sensors = [self.car_obj.RightDistanceSensor]
+        self.sensors = [self.car_obj.LeftDistanceSensor, self.car_obj.RightDistanceSensor]
 
     def step(self, action, dt):
         """"observation (object): agent's observation of the current environment
@@ -136,17 +141,19 @@ class SimpleCarAIEnv(gym.Env):
                 # no collision found, draw off-screen
                 sensor.collision_marker.x = -50
                 sensor.collision_marker.y = -50
-            self.observations[current_sensor_number] = min_distance
+            self.observations[0][current_sensor_number] = min_distance
+            current_sensor_number+=1
         self.t += dt
         if self.time_label:
             self.time_label.text = "Current Episode Time: " + str(round(self.t))
         if self.viewer:
             if not self.Terminate:
                 self.Terminate = self.viewer.Terminate
-        self.reward = self.score + 0.01*self.t
+        self.reward = self.score
         if self.done:
-            self.reward += -25  # penalty for hitting wall
-        return self.observations, self.reward, self.done, {'t': self.t}, self.Terminate  # , 'JStar': self.JStar
+            self.reward += -1  # penalty for hitting wall
+        self.JStar = 0.2*self.t
+        return self.observations, self.reward, self.done, {'t': self.t, 'JStar': self.JStar}, self.Terminate  # , 'JStar': self.JStar
 
     def reset(self):
         self.score = 0

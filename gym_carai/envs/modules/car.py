@@ -83,8 +83,7 @@ class Car:
         action [2] = brake (bool)
         """
         if self.mode == 'simple':
-            rot = action[0]-1
-            self.rotation += rot * self.rotate_speed * dt
+            self.rotation +=  action[0] * self.rotate_speed * dt
             self.vel = 90
         else:
             if abs(action[1]) > 1:
