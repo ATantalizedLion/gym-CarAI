@@ -16,6 +16,7 @@ def map_to_range(x, min_out=-1, max_out=1) :
     min_out += 1
     return  x_out * scale + min_out
 
+
 class Memory:
     def __init__(self):
         self.states = []
@@ -44,13 +45,14 @@ class CriticModel(tf.keras.Model):
         self.inner1 = tf.keras.layers.Dense(100, activation='relu')
         self.value = tf.keras.layers.Dense(observation_shape) # condense back into 2
 
-        self.opt = tf.keras.optimizers.Adam(learning_rate)
+        self.opt = tf.keras.optimizers.Adamax(learning_rate)
         # self.opt = tf.compat.v1.train.AdamOptimizer(learning_rate, use_locking=True)
 
     def call(self, inputs):
         x = self.inner1(inputs)
         J = self.value(x)
         return J
+
 
 class ActorModel(tf.keras.Model):
     def __init__(self, learning_rate, observation_shape):
@@ -61,12 +63,13 @@ class ActorModel(tf.keras.Model):
         self.inner1 = tf.keras.layers.Dense(100, activation='relu')
         self.turning = tf.keras.layers.Dense(1, activation=map_to_range)  # sigmoid for turning direction
 
-        self.opt = tf.keras.optimizers.Adam(learning_rate)
+        self.opt = tf.keras.optimizers.Adamax(learning_rate)
 
     def call(self, inputs):
         x = self.inner1(inputs)
         dir = self.turning(x)
         return dir
+
 
 def get_loss_critic(Critic, memory, gamma=0.99):
     # get value for each timestep
@@ -110,8 +113,8 @@ def get_loss_critic(Critic, memory, gamma=0.99):
         advantage = tf.convert_to_tensor(np.array(discounted_rewards)[:, None], dtype=tf.float32) - values
         critic_loss = advantage ** 2
     critic_loss = tf.reduce_mean(critic_loss)
-    print(discounted_rewards)
-    return critic_loss
+    return critic_loss, discounted_rewards
+
 
 def get_loss_actor(Actor, Critic, memory):
     # get value for each timestep, based on the reward derived from the critic.
@@ -123,6 +126,7 @@ def get_loss_actor(Actor, Critic, memory):
     actor_loss = tf.reduce_mean(actor_loss)
     return actor_loss
 
+
 # Setup for training etc.
 env = gym.make('carai-simple-v0')  # First open the environment
 
@@ -131,7 +135,7 @@ observation_shape = env.observation_space.shape[0]
 start_time = time.time()           # Register current time
 epoch = 1                          # Current episode
 maxEpoch = 100                     # max amount of epochs
-maxEpochTime = 50                  # [s] max seconds to spend per epoch
+maxEpochTime = 500                 # [s] max seconds to spend per epoch
 dt = 1/60                          # fps (should equal monitor refresh rate)
 maxSteps = int(maxEpochTime/dt)    # max duration of an epoch
 Terminate = None
@@ -139,12 +143,12 @@ done = 0
 learning_rate = 0.001
 mem = Memory()
 run = True
-
 Actor = ActorModel(learning_rate, observation_shape)  # global network
 Critic = CriticModel(learning_rate, observation_shape)  # global network
 maxRewardSoFar = -90000
 
 rewardavglist = []
+criticavglist = []
 
 while run:
     print("--- starting run %s ---" % epoch)
@@ -153,8 +157,9 @@ while run:
     mem.clear()
 
     # initial values
-    obs = np.array([observation_shape*[100]])
     epoch_loss = 0
+    action = np.array([0])
+    obs, reward, done, info_dict, Terminate = env.step(action, dt)
 
     for i in range(maxSteps):
         # calculate next step
@@ -171,7 +176,7 @@ while run:
     if not Terminate:
         # GradientTape tracks the gradient of all variables within scope, useful for optimizer
         with tf.GradientTape() as critic_tape:
-            critic_loss = get_loss_critic(Critic, mem)
+            critic_loss, critic_rewards = get_loss_critic(Critic, mem)
         # Apply found gradients to model
         critic_grads = critic_tape.gradient(critic_loss, Critic.trainable_weights)
         Critic.opt.apply_gradients(zip(critic_grads, Critic.trainable_weights))
@@ -189,13 +194,17 @@ while run:
 
     # Statistics for training evaluation
     rewardavg = sum(mem.rewards)/len(mem.rewards)
+    criticavg = sum(critic_rewards)/len(critic_rewards)
     rewardavglist.append(rewardavg)
+    criticavglist.append(criticavg)
     if rewardavg > maxRewardSoFar:
         maxRewardSoFar = rewardavg
-    print("- Highest reward yet {} - ".format(maxRewardSoFar))
-    print("- Most recent run reward {} - ".format(rewardavg))
+        correspCritic  = criticavg
+    print("- Highest reward yet {} - {} - ".format(maxRewardSoFar,correspCritic))
+    print("- Most recent run reward {} - {} - ".format(rewardavg,criticavg))
     if len(rewardavglist)>11:
         last = rewardavglist[-10:]
-        print("- Last ten runs average {} - ".format(sum(last)/len(last)))
+        last2 = criticavglist[-10:]
+        print("- Last ten runs average {}, - {} - ".format(sum(last)/len(last),sum(last2)/len(last2)))
 env.close()
 print("--- total %s seconds ---" % (time.time() - start_time))

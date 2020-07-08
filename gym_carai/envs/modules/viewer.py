@@ -3,10 +3,11 @@ import numpy as np
 
 class Viewer():
     # TODO: Optimize rendering geometry (draw open GL shapes?)
-    def __init__(self, width, height, manualControl=False):
+    def __init__(self, width, height, vsync, manualControl=False):
         self.width = width
         self.height = height
         self.window = pyglet.window.Window(width=self.width, height=self.height)
+        self.window.set_vsync(vsync)
         self.is_open = open
         self.toDraw = []
         self.score_label = None
