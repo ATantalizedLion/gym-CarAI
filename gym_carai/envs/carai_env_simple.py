@@ -71,10 +71,11 @@ class SimpleCarAIEnv(gym.Env):
         # implemented in this env:
         # self.sensors = [self.car_obj.FrontDistanceSensor, self.car_obj.RightDistanceSensor,
         #                 self.car_obj.RearDistanceSensor, self.car_obj.LeftDistanceSensor]
-        self.sensors = [self.car_obj.RightDistanceSensor, self.car_obj.LeftDistanceSensor, self.car_obj.FrontDistanceSensor]
+        self.sensors = [self.car_obj.RightDistanceSensor, self.car_obj.LeftDistanceSensor,
+                        self.car_obj.FrontDistanceSensor]
 
         self.observation_space = spaces.Box(np.zeros(len(self.sensors)),
-                                            600*np.ones(len(self.sensors)))
+                                            self.car_obj.sensorRange*np.ones(len(self.sensors)))
         self.observations = np.array([np.zeros(len(self.sensors))])
 
     def step(self, action, dt):

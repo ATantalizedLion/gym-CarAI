@@ -16,9 +16,9 @@ class Viewer():
         self.episode_label = None
         self.Terminate = None
         self.window.on_close = self.window_closed
+        pyglet.gl.glClearColor(1, 1, 1, 1)
 
     def render(self, return_rgb_array=False):
-        pyglet.gl.glClearColor(1, 1, 1, 1)
         self.window.clear()
         self.window.dispatch_events()
         # self.transform.enable()

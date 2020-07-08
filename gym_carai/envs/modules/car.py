@@ -22,6 +22,7 @@ class Sensor(Line):
         self.collision_marker = pyglet.sprite.Sprite(img=self.colimg, x=-10, y=-10, batch=debug_batch)
         self.sensor_range = sensor_range
 
+
 class Car:
     def __init__(self, initial_position=(100, 100, 0), car_length=64, main_batch=[], debug_batch=[], mode=[]):
         self.debug_batch = debug_batch
@@ -44,7 +45,7 @@ class Car:
         self.acc = 0.0
 
         self.mode = mode
-        self.sensorDistance = 1920
+        self.sensorRange = 1920
 
         # related to controls
         self.key_handler = key.KeyStateHandler()
@@ -67,14 +68,14 @@ class Car:
         sl = self.c - np.array([0.0, self.width / 2]) - np.array([-self.width / 2, 0.0])
         sr = self.c + np.array([0.0, self.width / 2]) + np.array([-self.width / 2, 0.0])
 
-        self.FrontDistanceSensor = Sensor([fc[0], fc[1], fc[0], fc[1] + self.sensorDistance], self.debug_batch,
-                                          self.sensorDistance)
-        self.RearDistanceSensor = Sensor([rc[0], rc[1], rc[0], rc[1] - self.sensorDistance], self.debug_batch,
-                                         self.sensorDistance)
-        self.LeftDistanceSensor = Sensor([sl[0], sl[1], sl[0] - self.sensorDistance, sl[1]], self.debug_batch,
-                                         self.sensorDistance)
-        self.RightDistanceSensor = Sensor([sr[0], sr[1], sr[0] + self.sensorDistance, sr[1]], self.debug_batch,
-                                          self.sensorDistance)
+        self.FrontDistanceSensor = Sensor([fc[0], fc[1], fc[0], fc[1] + self.sensorRange], self.debug_batch,
+                                          self.sensorRange)
+        self.RearDistanceSensor = Sensor([rc[0], rc[1], rc[0], rc[1] - self.sensorRange], self.debug_batch,
+                                         self.sensorRange)
+        self.LeftDistanceSensor = Sensor([sl[0], sl[1], sl[0] - self.sensorRange, sl[1]], self.debug_batch,
+                                         self.sensorRange)
+        self.RightDistanceSensor = Sensor([sr[0], sr[1], sr[0] + self.sensorRange, sr[1]], self.debug_batch,
+                                          self.sensorRange)
 
     def update(self, dt, action):
         """"
