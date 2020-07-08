@@ -50,10 +50,6 @@ class SimpleCarAIEnv(gym.Env):
                                        np.array([+1], dtype=np.float64),
                                        dtype=np.float64)  # steering only
 
-        self.observation_space = spaces.Box(np.array([0, 0]),
-                                            np.array([600, 600]),
-                                            dtype=np.float32)
-
         self.track_name = 'simpleSquareTrack'
         self.track_name = 'simpleSquareTrackTighter'
 
@@ -77,12 +73,20 @@ class SimpleCarAIEnv(gym.Env):
         # self.sensors = [self.car_obj.FrontDistanceSensor, self.car_obj.RightDistanceSensor,
         #                 self.car_obj.RearDistanceSensor, self.car_obj.LeftDistanceSensor]
         self.sensors = [self.car_obj.LeftDistanceSensor, self.car_obj.RightDistanceSensor]
+        self.sensors = [self.car_obj.FrontDistanceSensor, self.car_obj.RightDistanceSensor,
+                        self.car_obj.RearDistanceSensor, self.car_obj.LeftDistanceSensor]
+
+        self.observation_space = spaces.Box(np.zeros(len(self.sensors)),
+                                            600*np.ones(len(self.sensors)),
+                                            dtype=np.float32)
+        self.observations = np.array([np.zeros(len(self.sensors))])
 
     def step(self, action, dt):
         """"observation (object): agent's observation of the current environment
             reward (float) : amount of reward returned after previous action
             done (bool): whether the episode has ended, in which case further step() calls will return undefined results
             info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)"""
+        self.reward = 0
         if self.manual:
             if self.keys[pyglet.window.key.LEFT] == 1:
                 if self.keys[pyglet.window.key.RIGHT] == 1:
@@ -120,6 +124,7 @@ class SimpleCarAIEnv(gym.Env):
                         if self.current_checkpoint > len(self.checkpoints):
                             self.current_checkpoint -= len(self.checkpoints)
                         self.score += obj.score
+                        self.reward += obj.score
                         self.score_label.text = "Current Score: " + str(self.score)
 
         current_sensor_number = 0
@@ -149,10 +154,14 @@ class SimpleCarAIEnv(gym.Env):
         if self.viewer:
             if not self.Terminate:
                 self.Terminate = self.viewer.Terminate
-        self.reward = self.score
+
+        if self.reward == 0:
+            self.reward = -0.01  # reward for current state if not at a checkpoint
+
         if self.done:
-            self.reward += -1  # penalty for hitting wall
-        self.JStar = 0.2*self.t
+            self.reward = -50 - 100/self.t  # penalty for hitting wall, higher penalty if wall is hit early
+
+        self.JStar = 0
         return self.observations, self.reward, self.done, {'t': self.t, 'JStar': self.JStar}, self.Terminate  # , 'JStar': self.JStar
 
     def reset(self):

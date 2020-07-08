@@ -48,7 +48,7 @@ class Car:
 
         # related to controls
         self.key_handler = key.KeyStateHandler()
-        self.rotate_speed = 200.0
+        self.rotate_speed = 180.0
         self.acc_speed = 300.0
 
         # set up bumpers

@@ -41,10 +41,11 @@ class CriticModel(tf.keras.Model):
         super(CriticModel, self).__init__()
 
         # critic part of model (value function)
-        self.inner1 = tf.keras.layers.Dense(75, activation='relu')
+        self.inner1 = tf.keras.layers.Dense(100, activation='relu')
         self.value = tf.keras.layers.Dense(observation_shape) # condense back into 2
 
-        self.opt = tf.compat.v1.train.AdamOptimizer(learning_rate, use_locking=True)
+        self.opt = tf.keras.optimizers.Adam(learning_rate)
+        # self.opt = tf.compat.v1.train.AdamOptimizer(learning_rate, use_locking=True)
 
     def call(self, inputs):
         x = self.inner1(inputs)
@@ -57,39 +58,65 @@ class ActorModel(tf.keras.Model):
         self.observation_shape = observation_shape
 
         # actor part of Model (policies)
-        self.inner1 = tf.keras.layers.Dense(75, activation='relu')
+        self.inner1 = tf.keras.layers.Dense(100, activation='relu')
         self.turning = tf.keras.layers.Dense(1, activation=map_to_range)  # sigmoid for turning direction
 
-        self.opt = tf.compat.v1.train.AdamOptimizer(learning_rate, use_locking=True)
+        self.opt = tf.keras.optimizers.Adam(learning_rate)
 
     def call(self, inputs):
         x = self.inner1(inputs)
         dir = self.turning(x)
         return dir
 
-def get_loss_critic(Critic, memory, gamma=0.95):
+def get_loss_critic(Critic, memory, gamma=0.99):
     # get value for each timestep
     values = Critic(tf.convert_to_tensor(np.vstack(memory.actions), dtype=tf.float32))
 
-    # discount the rewards
-    reward_sum = 0
-    discounted_rewards = []
-    for reward in memory.rewards[::-1]:
-        reward_sum = reward + gamma * reward_sum
-        discounted_rewards.append(reward_sum)
-    discounted_rewards = discounted_rewards[::-1]
-
-    # get J for each timestep
-    advantage = tf.convert_to_tensor(np.array(discounted_rewards)[:, None], dtype=tf.float32) - values
-    critic_loss = advantage ** 2
+    # Try #1: like in cartpole
+    v = 1
+    if v == 1:
+        # This is based on the assumption that reward evaluates how good current state is
+        # gamma is the forgetting factor, prioritize short term rewards over long term.
+        reward_sum = 0
+        discounted_rewards = []
+        for reward in memory.rewards[::-1]:
+            reward_sum = reward + gamma * reward_sum
+            discounted_rewards.append(reward_sum)
+        discounted_rewards = discounted_rewards[::-1]
+        # get J for each timestep
+        advantage = tf.convert_to_tensor(np.array(discounted_rewards)[:, None], dtype=tf.float32) - values
+        critic_loss = advantage ** 2
+    elif v == 2:
+        # Try #2: like in slides - currently does not work with gradientTape
+        obs_size = len(memory.states[1][0])
+        ecs = []
+        for i in range(len(memory.rewards))[:-1]:
+            ec = values[i+1] - (gamma * values[i] - memory.rewards[i])
+            ecs.append(ec)
+        # get J for each timestep
+        ecs = tf.convert_to_tensor(np.array(ecs)[:, None], dtype=tf.float32)
+        critic_loss = ecs ** 2
+    elif v == 3:
+        # Try #3: hybrid
+        # discount the rewards based on 'R_t = sum gamma^(k-t) r_k(s_k, a_k)
+        gamma_mag = gamma
+        reward_sum = 0
+        discounted_rewards = []
+        for reward in memory.rewards[::-1]:
+            gamma_mag = gamma*gamma_mag
+            discounted_rewards.append(reward*gamma_mag)
+        # discounted_rewards = discounted_rewards[::-1]  # get original order
+        # get J for each timestep
+        advantage = tf.convert_to_tensor(np.array(discounted_rewards)[:, None], dtype=tf.float32) - values
+        critic_loss = advantage ** 2
     critic_loss = tf.reduce_mean(critic_loss)
+    print(discounted_rewards)
     return critic_loss
 
 def get_loss_actor(Actor, Critic, memory):
-    # get value for each timestep
-    gamma = 0.99
+    # get value for each timestep, based on the reward derived from the critic.
+    # get critic reward through actor response to allow gradienttape to get the differences.
     values = Critic(Actor(tf.convert_to_tensor(np.vstack(memory.states), dtype=tf.float32)))
-
     # get J for each timestep
     err = values - tf.convert_to_tensor(np.array(memory.JStar)[:, None], dtype=tf.float32)
     actor_loss = err ** 2
@@ -115,6 +142,7 @@ run = True
 
 Actor = ActorModel(learning_rate, observation_shape)  # global network
 Critic = CriticModel(learning_rate, observation_shape)  # global network
+maxRewardSoFar = -90000
 
 rewardavglist = []
 
@@ -125,7 +153,7 @@ while run:
     mem.clear()
 
     # initial values
-    obs = np.array([[100, 100]])
+    obs = np.array([observation_shape*[100]])
     epoch_loss = 0
 
     for i in range(maxSteps):
@@ -158,12 +186,16 @@ while run:
     print("--- %s seconds ---" % (time.time() - run_time))
 
     epoch += 1
+
+    # Statistics for training evaluation
     rewardavg = sum(mem.rewards)/len(mem.rewards)
     rewardavglist.append(rewardavg)
+    if rewardavg > maxRewardSoFar:
+        maxRewardSoFar = rewardavg
+    print("- Highest reward yet {} - ".format(maxRewardSoFar))
+    print("- Most recent run reward {} - ".format(rewardavg))
     if len(rewardavglist)>11:
         last = rewardavglist[-10:]
-        print(rewardavg)
-        print(sum(last)/len(last))
+        print("- Last ten runs average {} - ".format(sum(last)/len(last)))
 env.close()
 print("--- total %s seconds ---" % (time.time() - start_time))
-
