@@ -6,6 +6,7 @@ class Viewer():
     def __init__(self, width, height, vsync, manualControl=False):
         self.width = width
         self.height = height
+        config = pyglet.gl.Config(sample_buffers=1, samples=4)
         self.window = pyglet.window.Window(width=self.width, height=self.height)
         self.window.set_vsync(vsync)
         self.is_open = open
@@ -21,6 +22,9 @@ class Viewer():
     def render(self, return_rgb_array=False):
         self.window.clear()
         self.window.dispatch_events()
+        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+        pyglet.gl.glEnable(pyglet.gl.GL_LINE_SMOOTH)
+        pyglet.gl.glHint(pyglet.gl.GL_LINE_SMOOTH_HINT, pyglet.gl.GL_DONT_CARE)
         # self.transform.enable()
         for batch in self.toDraw:
             batch.draw()

@@ -11,7 +11,7 @@ from gym_carai.envs.modules.viewer import Viewer
 pyglet.options['debug_gl'] = False  # performance increase
 window_h_size = 1920
 window_v_size = 1080
-debug = 0  # renders all bumpers, sensors and collision markers.
+debug = 0 # renders all bumpers, sensors and collision markers.
 
 
 class SimpleCarAIEnv(gym.Env):
@@ -53,13 +53,8 @@ class SimpleCarAIEnv(gym.Env):
 
         # define functions
         self.walls, self.checkpoints, car_position = generate_track(
-            'gym_carai/envs/resources/' + self.track_name + '.csv')
+            'gym_carai/envs/resources/' + self.track_name + '.csv', self.track_batch)
         self.current_checkpoint = 1
-
-        for item in self.walls:
-            item.sprite.batch = self.track_batch
-        for item in self.checkpoints:
-            item.sprite.batch = self.track_batch
 
         self.car_obj = Car(car_position, debug_batch=self.debug_batch, mode='simple')
         self.car_obj.sprite.batch = self.main_batch

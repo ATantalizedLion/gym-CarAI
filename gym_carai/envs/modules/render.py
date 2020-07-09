@@ -86,7 +86,10 @@ class Line:
         self.x2 = x2
         self.y2 = y2
         self.deleted = None
-        self.rotation = np.rad2deg(np.arctan((y2 - y1) / (x2 - x1)))
+        if self.x1 != self.x2:
+            self.rotation = np.rad2deg(np.arctan((y2 - y1) / (x2 - x1)))
+        else:
+            self.rotation = 90.0
         self.length = np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
         self.batch = batch
         self.vertices = (self.x1, self.y1,

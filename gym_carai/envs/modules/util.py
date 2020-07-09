@@ -1,7 +1,6 @@
 import numpy as np
 import pyglet
-from pyglet.gl import *
-
+from gym_carai.envs.modules.render import Rect, Line
 
 def center_image(image):
     """ Sets an image's anchor point to the center """
@@ -62,7 +61,7 @@ def line_overlapping(line1, line2):
         return False, p, q, t, r, u, s
 
 
-class Line:
+class LineObject:
     def __init__(self, pos, height=4):
         # Load Pos Data
         self.x1 = pos[0]
@@ -80,21 +79,15 @@ class Line:
         else:
             self.rotation = 90.0
         self.rotation_rad = np.deg2rad(self.rotation)
-        self.image = None
+
+        # Rendering object
         self.sprite = None
 
     def line(self):
         return np.array([self.x1, self.y1, self.x2, self.y2])
 
-    def set_image(self, img, center=1):
-        self.image = pyglet.resource.image(img)
-        if center == 1:
-            center_image(self.image)
-        self.sprite = pyglet.sprite.Sprite(self.image, x=self.x, y=self.y)
-        self.sprite.image = self.image
-        self.sprite.rotation = self.rotation
-        self.sprite.scale_x = (self.width + self.height) / self.image.width
-        self.sprite.scale_y = self.height / self.image.height
+    def create_sprite(self, batch, color):
+        self.sprite = Line(batch, self.x1, self.y1, self.x2, self.y2, color=color)
 
     # update position based upon x,y,rotation
     def update_position(self, pos):
@@ -105,9 +98,8 @@ class Line:
             self.rotation = pos[2]
             self.rotation_rad = np.deg2rad(self.rotation)
 
-            self.sprite.x = self.x
-            self.sprite.y = self.y
-            self.sprite.rotation = self.rotation
+            if self.sprite is not None:
+                self.sprite.update_position_rot(self.rotation, self.x, self.y)
 
             self.x1 = self.x + np.cos(self.rotation_rad)*-self.width/2
             self.x2 = self.x + np.cos(self.rotation_rad)*self.width/2
@@ -127,11 +119,9 @@ class Line:
             else:
                 self.rotation = 90.0
             self.rotation_rad = np.deg2rad(self.rotation)
-            self.sprite.x = self.x
-            self.sprite.y = self.y
-            self.sprite.rotation = self.rotation
-            self.sprite.scale_x = (self.width + self.height) / self.image.width
-            self.sprite.scale_y = self.height / self.image.height
+
+            if self.sprite is not None:
+                self.sprite.update_position(self.x1, self.y1, self.x2, self.y2)
 
     def update_position_x1y1(self, pos):
         self.x1 = pos[0]
@@ -144,31 +134,6 @@ class Line:
         self.y = self.y1 - np.sin(self.rotation_rad) * self.width / 2
         self.y2 = self.y - np.sin(self.rotation_rad) * self.width / 2
 
-        self.sprite.x = self.x
-        self.sprite.y = self.y
-        self.sprite.rotation = self.rotation
-
-
-class Circle:
-    def __init__(self, r, points, cent_pos, color, batch):
-        self.r = r
-        self.points = points
-        vertices = []
-        for i in range(points):
-            angle = np.deg2rad(i/points * 360.0)
-            x = r * np.cos(angle) + cent_pos[0]
-            y = r * np.sin(angle) + cent_pos[1]
-            vertices += [x, y]
-        self.circle = pyglet.graphics.vertex_list(points, ('v2f', vertices))
-        self.batch = batch
-
-    def update_position(self, cent_pos):
-        vertices = []
-        for i in range(self.points):
-            angle = np.deg2rad(i/self.points * 360.0)
-            x = self.r * np.cos(angle) + cent_pos[0]
-            y = self.r * np.sin(angle) + cent_pos[1]
-            vertices += [x, y]
-        glColor3f(1,0,0)
-        self.circle = self.batch.add(self.points, GL_LINES, None, ('v2f', vertices))
+        if self.sprite is not None:
+            self.sprite.update_position(self.x1, self.y1, self.x2, self.y2)
 

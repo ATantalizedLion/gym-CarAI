@@ -1,22 +1,21 @@
 import pyglet
 import numpy as np
 
-from gym_carai.envs.modules.util import center_image, Line, vector_length, Circle
+from gym_carai.envs.modules.util import center_image, LineObject
 from pyglet.window import key
 
 
-class Bumper(Line):
+class Bumper(LineObject):
     def __init__(self, pos, debug_batch):
         super().__init__(pos)
-        self.set_image('RedBar.png')
-        self.sprite.batch = debug_batch
+        self.create_sprite(debug_batch, color=(0, 255, 255))
 
 
-class Sensor(Line):
+class Sensor(LineObject):
     def __init__(self, pos, debug_batch, sensor_range):
         super().__init__(pos, height=2)
-        self.set_image('BlueBar.png')
-        self.sprite.batch = debug_batch
+        self.create_sprite(debug_batch, color=(0, 0, 255))
+        # TODO: Create 'X' class
         self.colimg = pyglet.resource.image('marker.png')
         center_image(self.colimg)
         self.collision_marker = pyglet.sprite.Sprite(img=self.colimg, x=-10, y=-10, batch=debug_batch)
@@ -51,10 +50,12 @@ class Car:
         self.acc_speed = 300.0
 
         # set up bumpers
-        front_corner1 = self.c + np.cos(self.rotation_rad) * np.array([-self.width / 2, self.height / 2])
-        front_corner2 = self.c + np.cos(self.rotation_rad) * np.array([self.width / 2, self.height / 2])
-        rear_corner1 = self.c - np.cos(self.rotation_rad) * np.array([self.width / 2, self.height / 2])
-        rear_corner2 = self.c - np.cos(self.rotation_rad) * np.array([-self.width / 2, self.height / 2])
+        cr = np.cos(self.rotation_rad)
+        sr = np.sin(self.rotation_rad)
+        front_corner1 = self.c + cr * np.array([-self.width / 2, self.height / 2])
+        front_corner2 = self.c + cr * np.array([self.width / 2, self.height / 2])
+        rear_corner1 = self.c - cr * np.array([self.width / 2, self.height / 2])
+        rear_corner2 = self.c - cr * np.array([-self.width / 2, self.height / 2])
         self.Bumper = Bumper([front_corner1[0], front_corner1[1], front_corner2[0], front_corner2[1]], self.debug_batch)
         self.SideL = Bumper([front_corner1[0], front_corner1[1], rear_corner1[0], rear_corner1[1]], self.debug_batch)
         self.SideR = Bumper([front_corner2[0], front_corner2[1], rear_corner2[0], rear_corner2[1]], self.debug_batch)
@@ -99,8 +100,8 @@ class Car:
         sin = np.sin(self.rotation_rad)
         self.vel += self.acc * dt
 
-        self.x += self.vel * np.sin(self.rotation_rad) * dt
-        self.y += self.vel * np.cos(self.rotation_rad) * dt
+        self.x += self.vel * sin * dt
+        self.y += self.vel * cos * dt
 
         self.sprite.x = self.x
         self.sprite.y = self.y
@@ -117,10 +118,10 @@ class Car:
              - cos * np.array([-self.width / 2, 0.0])
         sr = self.c + sin * np.array([0.0, self.width / 2]) \
              + cos * np.array([-self.width / 2, 0.0])
-        self.Bumper.update_position([fc[0], fc[1], self.rotation])
-        self.Rear.update_position([rc[0], rc[1], self.rotation])
-        self.SideL.update_position([sl[0], sl[1], self.rotation - 90])
-        self.SideR.update_position([sr[0], sr[1], self.rotation - 90])
+        self.Bumper.update_position([fc[0], fc[1], -self.rotation])
+        self.Rear.update_position([rc[0], rc[1], -self.rotation])
+        self.SideL.update_position([sl[0], sl[1], -(self.rotation - 90)])
+        self.SideR.update_position([sr[0], sr[1], -(self.rotation - 90)])
 
         # Calculate line based sensor position
         self.FrontDistanceSensor.update_position([fc[0], fc[1], self.rotation - 90])
