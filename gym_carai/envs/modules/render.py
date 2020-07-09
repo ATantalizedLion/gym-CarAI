@@ -10,7 +10,6 @@ class Rect:
         self.h = h
         self.rotation = rotation
         self.batch = batch
-        self.deleted = None
 
         if len(color) == 3:
             self.color = color * 4
@@ -51,12 +50,9 @@ class Rect:
             self.color = color
         else:
             raise Exception("Color vector wrong size! Got {}, expected multiple of 3".format(len(color)))
-        self.v.color[:] = self.color
+        self.v.colors[:] = self.color
 
     def update_vertices_c(self):
-        if self.deleted:
-            self.delete()
-            return
         theta_rad = np.deg2rad(self.rotation)
         cr = np.cos(theta_rad)
         sr = np.sin(theta_rad)
@@ -76,8 +72,9 @@ class Rect:
         self.v.vertices[:] = self.vertices
 
     def delete(self):
-        # TODO: Improve
-        self.v.vertices[:] = (-50, -45)*4
+        self.v.delete()
+        del self
+
 
 class Line:
     def __init__(self, batch, x1, y1, x2, y2, thickness=None, color=(0, 255, 0)):
@@ -85,7 +82,6 @@ class Line:
         self.y1 = y1
         self.x2 = x2
         self.y2 = y2
-        self.deleted = None
         if self.x1 != self.x2:
             self.rotation = np.rad2deg(np.arctan((y2 - y1) / (x2 - x1)))
         else:
@@ -110,9 +106,6 @@ class Line:
                                 )
 
     def update_position(self, x1, y1, x2, y2):
-        if self.deleted:
-            self.delete()
-            return
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
@@ -146,8 +139,49 @@ class Line:
             self.color = color
         else:
             raise Exception("Color vector wrong size! Got {}, expected multiple of 3".format(len(color)))
-        self.v.color[:] = self.color
+        self.v.colors[:] = self.color
 
     def delete(self):
-        self.deleted = True
-        self.v.vertices[:] = (-50,-50,-50,-50)
+        self.v.delete()
+        del self
+
+
+class Circle:
+    def __init__(self, r, points, x, y, batch, color=None):
+        self.batch = batch
+        self.r = r
+        self.points = points
+        self.vertices = []
+        self.x = x
+        self.y = y
+        self.color = (60, 60, 60)
+        for i in range(points):
+            angle = np.deg2rad(i/points * 360.0)
+            x = r * np.cos(angle) + self.x
+            y = r * np.sin(angle) + self.y
+            self.vertices += [x, y]
+        self.v = self.batch.add(points, pyglet.gl.GL_POLYGON, None,
+                                ('v2f', self.vertices),
+                                ('c3B', self.color*points)
+                                )
+        if color:
+            self.color = color
+            self.update_color(color)
+
+    def update_pos(self, x, y):
+        self.vertices = []
+        self.x = x
+        self.y = y
+        for i in range(self.points):
+            angle = np.deg2rad(i/self.points * 360.0)
+            x = self.r * np.cos(angle) + self.x
+            y = self.r * np.sin(angle) + self.y
+            self.vertices += [x, y]
+        self.v.vertices = self.vertices
+
+    def update_color(self, color):
+        if self.points%(len(color)/3) == 0:
+            num = int(self.points/(len(color)/3))
+        else:
+            raise Exception("Color vector wrong size! Got {}, ".format(len(color)))
+        self.v.colors[:] = self.color * num

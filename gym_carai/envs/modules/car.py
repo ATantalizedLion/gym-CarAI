@@ -10,7 +10,6 @@ class Bumper(LineObject):
         super().__init__(pos)
         self.create_sprite(debug_batch, color=(0, 255, 255))
 
-
 class Sensor(LineObject):
     def __init__(self, pos, debug_batch, sensor_range):
         super().__init__(pos, height=2)
@@ -20,7 +19,6 @@ class Sensor(LineObject):
         center_image(self.colimg)
         self.collision_marker = pyglet.sprite.Sprite(img=self.colimg, x=-10, y=-10, batch=debug_batch)
         self.sensor_range = sensor_range
-
 
 class Car:
     def __init__(self, initial_position=(100, 100, 0), car_length=64, main_batch=[], debug_batch=[], mode=[]):
