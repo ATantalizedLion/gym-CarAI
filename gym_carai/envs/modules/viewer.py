@@ -1,8 +1,8 @@
 import pyglet
 import numpy as np
 
+
 class Viewer():
-    # TODO: Optimize rendering geometry (draw open GL shapes?)
     def __init__(self, width, height, vsync, manualControl=False):
         self.width = width
         self.height = height

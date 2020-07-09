@@ -31,9 +31,7 @@ class Car:
         self.initPos = initial_position
         self.x = initial_position[0]
         self.y = initial_position[1]
-        self.xc = self.x
-        self.yc = self.y
-        self.c = np.array([self.xc, self.yc])
+        self.c = np.array([self.x, self.y])
         self.sprite = pyglet.sprite.Sprite(img=self.image, x=self.x, y=self.y)
         self.sprite.scale = car_length / self.image.height
         self.width = self.sprite.width
@@ -108,9 +106,7 @@ class Car:
         self.sprite.y = self.y
         self.sprite.rotation = self.rotation
 
-        self.xc = self.x
-        self.yc = self.y
-        self.c = np.array([self.xc, self.yc])
+        self.c = np.array([self.x, self.y])
 
         # Calculate bumper positions based on rotation and center position
         fc = self.c + cos * np.array([0.0, self.height / 2]) \
@@ -141,9 +137,7 @@ class Car:
     def reset(self):
         self.x = self.initPos[0]
         self.y = self.initPos[1]
-        self.xc = self.x
-        self.yc = self.y
-        self.c = np.array([self.xc, self.yc])
+        self.c = np.array([self.x, self.y])
         self.rotation = self.initPos[2]
         self.rotation_rad = np.deg2rad(self.rotation)
         self.vel = 0.0
