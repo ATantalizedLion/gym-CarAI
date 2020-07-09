@@ -22,13 +22,12 @@ class TrackBorder(LineObject):
 class Checkpoint(LineObject):
     _counter = 0
 
-    def __init__(self, pos, score, batch):
+    def __init__(self, pos, batch):
         super().__init__(pos)
         self.solid = 0
         self.create_sprite(batch, color=(0, 255, 0))
         Checkpoint._counter += 1
         self.id = Checkpoint._counter
-        self.score = score
 
 
 def generate_track(filename, batch):
@@ -39,7 +38,7 @@ def generate_track(filename, batch):
         if track_data[i, 0] == 0:
             track_objects.append(TrackBorder(track_data[i, 1:5], batch))
         elif track_data[i, 0] == 1:
-            checkpoints.append(Checkpoint(track_data[i, 1:5], track_data[i, 5], batch))
+            checkpoints.append(Checkpoint(track_data[i, 1:5], batch))
         elif track_data[i, 0] == -1:
             car_position = (track_data[i, 1:4])  # x, y, rotation
     return track_objects, checkpoints, car_position

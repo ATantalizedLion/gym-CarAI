@@ -78,7 +78,7 @@ class SimpleCarAIEnv(gym.Env):
             reward (float) : amount of reward returned after previous action
             done (bool): whether the episode has ended, in which case further step() calls will return undefined results
             info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)"""
-        self.reward = 0
+        self.reward = -0.05  # reward for current state if not at a checkpoint
         if self.manual:
             if self.keys[pyglet.window.key.LEFT] == 1:
                 if self.keys[pyglet.window.key.RIGHT] == 1:
@@ -89,14 +89,6 @@ class SimpleCarAIEnv(gym.Env):
                 action[0] = 1
             else:
                 action[0] = 0
-            # if self.keys[pyglet.window.key.UP] == 1:
-            #     action[1] = 1
-            # else:
-            #     action[1] = 0
-            # if self.keys[pyglet.window.key.DOWN] == 1:
-            #     action[2] = 1
-            # else:
-            #     action[2] = 0
 
         for obj in self.envObjects:
             obj.update(dt, action)
@@ -115,15 +107,14 @@ class SimpleCarAIEnv(gym.Env):
                         self.current_checkpoint += 1
                         if self.current_checkpoint > len(self.checkpoints):
                             self.current_checkpoint -= len(self.checkpoints)
-                        self.score += obj.score
-                        self.reward += obj.score
+                        self.reward = 0
                         self.score_label.text = "Current Score: " + str(self.score)
 
         current_sensor_number = 0
         for sensor in self.sensors:
             min_distance = sensor.sensor_range
             dist = min_distance
-            col_loc = [-50, -50]  # give some value to prevent crash
+            col_loc = [-50, -50]  # give some value
             for obj in self.walls:
                 tf, p, q, t, r, u, s = line_overlapping(sensor.line(), obj.line())
                 if tf:
@@ -139,7 +130,7 @@ class SimpleCarAIEnv(gym.Env):
                 sensor.collision_marker.x = -50
                 sensor.collision_marker.y = -50
             self.observations[0][current_sensor_number] = min_distance
-            current_sensor_number+=1
+            current_sensor_number += 1
         self.t += dt
         if self.time_label:
             self.time_label.text = "Current Episode Time: " + str(round(self.t))
@@ -147,14 +138,11 @@ class SimpleCarAIEnv(gym.Env):
             if not self.Terminate:
                 self.Terminate = self.viewer.Terminate
 
-        if self.reward == 0:
-            self.reward = -0.05  # reward for current state if not at a checkpoint
-
         if self.done:
             self.reward = -50 - 100/self.t  # penalty for hitting wall, higher penalty if wall is hit early
 
-        self.JStar = 0
-        return self.observations, self.reward, self.done, {'t': self.t, 'JStar': self.JStar}, self.Terminate  # , 'JStar': self.JStar
+        self.JStar = 0  # All rewards are negative so JStar is zero.
+        return self.observations, self.reward, self.done, {'t': self.t, 'JStar': self.JStar}, self.Terminate
 
     def reset(self):
         self.score = 0

@@ -21,13 +21,12 @@
   <component name="ChangeListManager">
     <list default="true" id="89ce01cb-7348-4762-a543-ba1224d9334c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_carai/envs/modules/car.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/modules/car.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_carai/envs/modules/render.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/modules/render.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_carai/envs/resources/BlackBar.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_carai/envs/resources/BlueBar.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_carai/envs/resources/GreenBar.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_carai/envs/resources/RedBar.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_carai/envs/resources/WhiteBar.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym_carai/envs/carai_env_simple.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/carai_env_simple.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym_carai/envs/modules/track.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/modules/track.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym_carai/envs/resources/roundedSquareTrackTighter.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym_carai/envs/resources/simpleSquareTrack.csv" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/resources/simpleSquareTrack.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym_carai/envs/resources/simpleSquareTrackTighter.csv" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/resources/simpleSquareTrackTighter.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym_carai/envs/resources/testin.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/quickMapEdit.py" beforeDir="false" afterPath="$PROJECT_DIR$/quickMapEdit.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -202,34 +201,34 @@
     </state>
     <state x="1700" y="459" key="FileChooserDialogImpl/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591480655663" />
     <state x="1523" y="667" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1594241063636" />
-    <state width="2539" height="248" key="GridCell.Tab.0.bottom" timestamp="1594312949792">
+    <state width="2539" height="248" key="GridCell.Tab.0.bottom" timestamp="1594329193187">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="1514" height="230" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1594120787982" />
     <state width="1348" height="213" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1593781239483" />
     <state width="1257" height="401" key="GridCell.Tab.0.bottom/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
-    <state width="2539" height="248" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1594312949792" />
-    <state width="2539" height="248" key="GridCell.Tab.0.center" timestamp="1594312949792">
+    <state width="2539" height="248" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1594329193187" />
+    <state width="2539" height="248" key="GridCell.Tab.0.center" timestamp="1594329193187">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="1514" height="230" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1594120787982" />
     <state width="1348" height="213" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1593781239483" />
     <state width="1257" height="401" key="GridCell.Tab.0.center/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
-    <state width="2539" height="248" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1594312949792" />
-    <state width="2539" height="248" key="GridCell.Tab.0.left" timestamp="1594312949792">
+    <state width="2539" height="248" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1594329193187" />
+    <state width="2539" height="248" key="GridCell.Tab.0.left" timestamp="1594329193187">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="1514" height="230" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1594120787982" />
     <state width="1348" height="213" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1593781239483" />
     <state width="1257" height="401" key="GridCell.Tab.0.left/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
-    <state width="2539" height="248" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1594312949792" />
-    <state width="2539" height="248" key="GridCell.Tab.0.right" timestamp="1594312949792">
+    <state width="2539" height="248" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1594329193187" />
+    <state width="2539" height="248" key="GridCell.Tab.0.right" timestamp="1594329193187">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="1514" height="230" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1594120787982" />
     <state width="1348" height="213" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1593781239483" />
     <state width="1257" height="401" key="GridCell.Tab.0.right/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
-    <state width="2539" height="248" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1594312949792" />
+    <state width="2539" height="248" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1594329193187" />
     <state width="1255" height="488" key="GridCell.Tab.1.bottom" timestamp="1594307407344">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>

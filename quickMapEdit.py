@@ -16,8 +16,8 @@ pyglet.gl.glClearColor(1, 1, 1, 1)
 
 
 class NodeManager():
-    # TODO: Checkpoints.. click creates two draggable points, one to the left and one to the right of the cursor,
-    #  control score of selected with scrollwheel
+    # TODO: Right clicking a node deletes it 
+    # TODO: Make checkpoints insertable next to selected
     # TODO: Export
     def __init__(self, batch):
         self.batch = batch
@@ -31,6 +31,11 @@ class NodeManager():
         self.grid_num = 4
         self.grid_size = self.grid_sizes[self.grid_num]
         self.CheckPointGroup = CheckPointGroup(batch)
+
+    def get_groups(self):
+        a = self.group_list
+        a.append(self.CheckPointGroup)
+        return a
 
     def create_group(self):
         self.group_list.append(NodeGroup(self.batch, self.node_groups))
@@ -123,6 +128,9 @@ class NodeGroup:
         self.latest_node += 1
         return node
 
+    def get_nodes(self):
+        return self.nodes
+
     def delete_node(self, node_id):
         ind = 0
         if self.current_node is not None:
@@ -135,21 +143,21 @@ class NodeGroup:
         self.gen_track()
 
     def delete_all_nodes(self):
-        self.deactivate_node()
+        self.deselect_node()
         for i in range(len(self.nodes))[::-1]:
             self.nodes[i].delete()
 
-    def activate_node(self, node):
+    def select_node(self, node):
         if self.current_node is not None and node.id == self.current_node.id:
-            node.deactivate()
+            self.current_node.deselect()
         else:
-            self.deactivate_node()
+            self.deselect_node()
             self.current_node = node
-            node.activate()
+            node.select()
 
-    def deactivate_node(self):
+    def deselect_node(self):
         if self.current_node is not None:
-            self.current_node.deactivate()
+            self.current_node.activate()
         self.current_node = None
 
     def activate(self):
@@ -157,9 +165,9 @@ class NodeGroup:
             node.sprite.update_color((0, 33, 71))
 
     def deactivate(self):
-        self.deactivate_node()
+        self.deselect_node()
         for node in self.nodes:
-            node.sprite.update_color((71, 71, 71))
+            node.deactivate()
 
     def del_track(self):
         for track in self.tracks:
@@ -191,14 +199,18 @@ class Node:
         self.x_on_grid = None
         self.y_on_grid = None
         self.update_pos(self.x, self.y)
-        self.active_color = (33, 71, 33)
-        self.inactive_color = (0, 33, 71)
+        self.selected_color = (33, 71, 33)
+        self.active_color = (0, 33, 71)
+        self.inactive_color = (71, 71, 71)
 
     def check_hover(self, x, y):
         if abs(x - self.x_on_grid) < self.detection_distance and abs(y - self.y_on_grid) < self.detection_distance:
             return True
         else:
             return False
+
+    def get_group(self):
+        return self.NodeGroup
 
     def update_pos(self, x, y):
         self.x = x
@@ -207,7 +219,13 @@ class Node:
         self.y_on_grid = NodeManager.grid_size * round(y / NodeManager.grid_size)
         self.sprite.update_pos(self.x_on_grid, self.y_on_grid)
 
+    def select(self):
+        self.sprite.update_color(self.selected_color)
+
     def activate(self):
+        self.sprite.update_color(self.active_color)
+
+    def deselect(self):
         self.sprite.update_color(self.active_color)
 
     def deactivate(self):
@@ -221,6 +239,8 @@ class Node:
 
 class CheckPointGroup:
     def __init__(self, batch):
+        '''Acts like a regular group, but intercepts all node calls to checkpoint pair calls, which combine the
+        two nodes of a checkpoint '''
         self.id = id
         self.batch = batch
         self.latest_node = 0
@@ -229,10 +249,19 @@ class CheckPointGroup:
         self.tracks = []
         self.current_node = None
         self.pairs = []  # contains objects linking two checkpoint nodes.
+        self.current_pair = None
 
-    def create_node(self, x, y):
+    def get_nodes(self):
+        return self.nodes
+
+    def get_current_pair(self):
+        return self.current_pair
+
+    def create_node(self, x, y): # Actually creates a pair!
         node = CheckPointPair(x, y, self.batch, self.latest_node, self)
         self.pairs.append(node)
+        self.nodes.append(node.node1)
+        self.nodes.append(node.node2)
         self.latest_node += 1
 
     def del_track(self):
@@ -249,14 +278,63 @@ class CheckPointGroup:
             y2 = self.pairs[i].node2.y_on_grid
             self.tracks.append(Checkpoint([x1, y1, x2, y2], self.batch))
 
+    def select_node(self, node):
+        if self.current_node is not None and node.CheckPointPair.id == self.current_node.CheckPointPair.id:
+            self.current_node.CheckPointPair.deselect()
+            self.current_node = None
+        else:
+            self.deselect_node()
+            self.current_node = node
+            node.CheckPointPair.select()
+
+    def deselect_node(self):
+        if self.current_node is not None:
+            self.current_node.CheckPointPair.activate()
+        self.current_node = None
+
+    def activate(self):
+        for node in self.nodes:
+            node.sprite.update_color((0, 33, 71))
+
+    def deactivate_node(self):
+        if self.current_pair is not None:
+            self.current_pair.deactivate()
+        self.current_pair = None
+
+    def deactivate(self):
+        self.current_pair = None
+        self.current_node = None
+        for node in self.get_nodes():
+            node.update_color(node.inactive_color)
+
+
 class CheckPointPair:
     def __init__(self, x, y, batch, id, CheckPointGroup):
         self.default_dist = 100
         self.CheckPointGroup = CheckPointGroup
         self.id = id
-        self.node1 = CheckPointNode(x-self.default_dist, y, batch, 1, CheckPointPair)
-        self.node2 = CheckPointNode(x+self.default_dist, y, batch, 2, CheckPointPair)
+        self.node1 = CheckPointNode(x-self.default_dist, y, batch, 1, self)
+        self.node2 = CheckPointNode(x+self.default_dist, y, batch, 2, self)
         self.nodes = [self.node1, self.node2]
+
+    def select(self):
+        print('select')
+        for node in self.nodes:
+            node.select()
+            print(node.id)
+
+    def activate(self):
+        for node in self.nodes:
+            node.activate()
+            print(node.id)
+
+    def deactivate(self):
+        for node in self.nodes:
+            node.deactivate()
+
+    def deselect(self):
+        for node in self.nodes:
+            node.deselect()
 
 
 class CheckPointNode():
@@ -266,13 +344,20 @@ class CheckPointNode():
         self.y = y
         self.CheckPointPair = CheckPointPair
         self.size = 25
+        self.selected_color = (33, 71, 33)
         self.active_color = (255, 94, 19)
-        self.inactive_color = (0, 33, 71)
+        self.inactive_color = (71, 71, 71)
         self.detection_distance = self.size / 2
         self.sprite = Rect(x, y, 0, self.size, self.size, batch, color=self.active_color)
         self.x_on_grid = None
         self.y_on_grid = None
         self.update_pos(self.x, self.y)
+
+    def get_group(self):
+        return CheckPointGroup
+
+    def get_pair(self):
+        return CheckPointPair
 
     def check_hover(self, x, y):
         if abs(x - self.x_on_grid) < self.detection_distance and abs(y - self.y_on_grid) < self.detection_distance:
@@ -287,14 +372,20 @@ class CheckPointNode():
         self.y_on_grid = NodeManager.grid_size * round(y / NodeManager.grid_size)
         self.sprite.update_pos(self.x_on_grid, self.y_on_grid)
 
+    def select(self):
+        self.sprite.update_color(self.selected_color)
+
     def activate(self):
         self.sprite.update_color(self.active_color)
 
     def deactivate(self):
         self.sprite.update_color(self.inactive_color)
 
+    def deselect(self):
+        self.sprite.update_color(self.active_color)
+
     def delete(self):
-        self.NodeGroup.delete_node(self.id)
+        self.CheckPointPair.CheckPointGroup.delete_pair(self.CheckPointPair.id)
         self.sprite.delete()
         del self
 
@@ -312,7 +403,7 @@ def on_draw():
 def on_mouse_motion(x, y, dx, dy):
     if NodeManager.current_group is not None:
         NodeManager.current_group.nodes_under_mouse = []
-        for node in NodeManager.current_group.nodes:
+        for node in NodeManager.current_group.get_nodes():
             if node.check_hover(x, y):
                 NodeManager.current_group.nodes_under_mouse.append(node)
 
@@ -329,14 +420,14 @@ def on_mouse_press(x, y, button, modifiers):
     if button == pyglet.window.mouse.LEFT:
         activated = 0
         for node in NodeManager.current_group.nodes_under_mouse:
-            node.NodeGroup.activate_node(node)
+            NodeManager.current_group.select_node(node)
             activated = 1
         if activated == 0:
-            for group in NodeManager.group_list:
-                for node in group.nodes:
+            for group in NodeManager.get_groups():
+                for node in group.get_nodes():
                     if node.check_hover(x, y):
                         NodeManager.activate_group(node.NodeGroup)
-                        NodeManager.current_group.activate_node(node)
+                        NodeManager.current_group.select_node(node)
 
     elif button == pyglet.window.mouse.RIGHT:
         # create node
@@ -369,12 +460,6 @@ def on_key_press(symbol, modifiers):
         NodeManager.next_group()
     elif symbol == pyglet.window.key.LEFT:
         NodeManager.prev_group()
-
-    # elif symbol == pyglet.window.key.Q:
-    #     if NodeManager.snap_to_grid:
-    #         NodeManager.snap_to_grid = False
-    #     else:
-    #         NodeManager.snap_to_grid = True
 
 
 @window.event
