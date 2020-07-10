@@ -20,13 +20,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="89ce01cb-7348-4762-a543-ba1224d9334c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gym-carai.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gym-carai.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_carai/envs/carai_env_simple.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/carai_env_simple.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AIStuffs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exported.csv" beforeDir="false" afterPath="$PROJECT_DIR$/exported.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gym_carai/envs/modules/car.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/modules/car.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_carai/envs/modules/track.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/modules/track.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_carai/envs/modules/viewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/modules/viewer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gym_carai/envs/resources/exported.csv" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/resources/exported.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_carai/envs/resources/roundedSquareTrackTighter.csv" beforeDir="false" afterPath="$PROJECT_DIR$/gym_carai/envs/resources/roundedSquareTrackTighter.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/quickMapEdit.py" beforeDir="false" afterPath="$PROJECT_DIR$/quickMapEdit.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
     </list>
@@ -52,8 +52,10 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/dragndrop.py" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -111,6 +113,69 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="laptop - manual test car ai" type="PythonConfigurationType" factoryName="Python">
+      <module name="gym-carai" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test_noTF.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="laptop - quickMapEdit" type="PythonConfigurationType" factoryName="Python">
+      <module name="gym-carai" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/quickMapEdit.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="laptop - test" type="PythonConfigurationType" factoryName="Python">
+      <module name="gym-carai" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="manual test carai" type="PythonConfigurationType" factoryName="Python">
       <module name="gym-carai" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -154,9 +219,12 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.carai_env_test" />
+      <item itemvalue="Python.laptop - manual test car ai" />
+      <item itemvalue="Python.laptop - quickMapEdit" />
+      <item itemvalue="Python.laptop - test" />
       <item itemvalue="Python.manual test carai" />
       <item itemvalue="Python.quickMapEdit" />
-      <item itemvalue="Python.carai_env_test" />
     </list>
   </component>
   <component name="SvnConfiguration">
@@ -189,50 +257,51 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="907" y="379" key="#Inspections/0.0.2560.1400@0.0.2560.1400" timestamp="1591629299676" />
-    <state x="279" y="149" width="1029" height="691" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1594287949181">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state x="202" y="21" width="1029" height="691" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1594405413649">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="202" y="21" width="1089" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1591985316333" />
-    <state x="253" y="27" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1591985977933" />
+    <state x="202" y="21" width="1089" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1594405413649" />
+    <state x="253" y="27" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1594397160175" />
     <state x="319" y="289" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591482759415" />
     <state x="279" y="149" width="1029" height="691" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1594287949181" />
     <state x="1254" y="487" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1591480632074">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1254" y="487" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591480632074" />
-    <state x="1523" y="667" key="FileChooserDialogImpl" timestamp="1594241063636">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state x="1142" y="495" key="FileChooserDialogImpl" timestamp="1594393435254">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
+    <state x="1142" y="495" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1594393435254" />
     <state x="1700" y="459" key="FileChooserDialogImpl/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591480655663" />
     <state x="1523" y="667" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1594241063636" />
-    <state width="2520" height="243" key="GridCell.Tab.0.bottom" timestamp="1594388136721">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state width="1500" height="243" key="GridCell.Tab.0.bottom" timestamp="1594413784546">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1514" height="230" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1594120787982" />
-    <state width="1348" height="213" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1593781239483" />
+    <state width="1500" height="243" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1594413784546" />
+    <state width="1899" height="374" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1594412909088" />
     <state width="1257" height="401" key="GridCell.Tab.0.bottom/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
-    <state width="2520" height="243" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1594388136721" />
-    <state width="2520" height="243" key="GridCell.Tab.0.center" timestamp="1594388136721">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state width="2520" height="243" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1594388790841" />
+    <state width="1500" height="243" key="GridCell.Tab.0.center" timestamp="1594413784545">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1514" height="230" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1594120787982" />
-    <state width="1348" height="213" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1593781239483" />
+    <state width="1500" height="243" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1594413784545" />
+    <state width="1899" height="374" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1594412909088" />
     <state width="1257" height="401" key="GridCell.Tab.0.center/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
-    <state width="2520" height="243" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1594388136721" />
-    <state width="2520" height="243" key="GridCell.Tab.0.left" timestamp="1594388136721">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state width="2520" height="243" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1594388790841" />
+    <state width="1500" height="243" key="GridCell.Tab.0.left" timestamp="1594413784545">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1514" height="230" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1594120787982" />
-    <state width="1348" height="213" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1593781239483" />
+    <state width="1500" height="243" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1594413784545" />
+    <state width="1899" height="374" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1594412909088" />
     <state width="1257" height="401" key="GridCell.Tab.0.left/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
-    <state width="2520" height="243" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1594388136721" />
-    <state width="2520" height="243" key="GridCell.Tab.0.right" timestamp="1594388136721">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state width="2520" height="243" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1594388790840" />
+    <state width="1500" height="243" key="GridCell.Tab.0.right" timestamp="1594413784546">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1514" height="230" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1594120787982" />
-    <state width="1348" height="213" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1593781239483" />
+    <state width="1500" height="243" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1594413784546" />
+    <state width="1899" height="374" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1594412909088" />
     <state width="1257" height="401" key="GridCell.Tab.0.right/0.0.2560.1400/3840.0.1536.824@0.0.2560.1400" timestamp="1591483075990" />
-    <state width="2520" height="243" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1594388136721" />
+    <state width="2520" height="243" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1594388790841" />
     <state width="1682" height="488" key="GridCell.Tab.1.bottom" timestamp="1594375264711">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -278,9 +347,10 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1273" y="0" width="1293" height="1407" key="dock-window-2/0.0.2560.1400@0.0.2560.1400" timestamp="1594104639560" />
-    <state x="313" y="321" width="672" height="678" key="search.everywhere.popup" timestamp="1594364568258">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state x="188" y="190" width="670" height="400" key="search.everywhere.popup" timestamp="1594410150464">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state x="188" y="190" width="670" height="400" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1594410150464" />
     <state x="313" y="321" width="672" height="678" key="search.everywhere.popup/0.0.2560.1400@0.0.2560.1400" timestamp="1594364568258" />
   </component>
 </project>

@@ -58,7 +58,7 @@ class Car:
 
         # related to controls
         self.key_handler = key.KeyStateHandler()
-        self.rotate_speed = 150.0
+        self.rotate_speed = 180.0
         self.acc_speed = 300.0
 
         # set up bumpers
@@ -123,29 +123,32 @@ class Car:
 
         # Calculate bumper positions based on rotation and center position
         fc = self.c + cos * np.array([0.0, self.height / 2]) \
-             - sin * np.array([-self.height / 2, 0.0])
+             - sin * np.array([-self.height / 2, 0.0])  # front centre
         rc = self.c - cos * np.array([0.0, self.height / 2]) \
-             + sin * np.array([-self.height / 2, 0.0])
+             + sin * np.array([-self.height / 2, 0.0])  # rear centre
         sl = self.c - sin * np.array([0.0, self.width / 2]) \
-             - cos * np.array([-self.width / 2, 0.0])
+             - cos * np.array([-self.width / 2, 0.0])  # left side centre
         sr = self.c + sin * np.array([0.0, self.width / 2]) \
-             + cos * np.array([-self.width / 2, 0.0])
+             + cos * np.array([-self.width / 2, 0.0])  # right side centre
         self.Bumper.update_position([fc[0], fc[1], self.rotation])
         self.Rear.update_position([rc[0], rc[1], self.rotation])
         self.SideL.update_position([sl[0], sl[1], (self.rotation - 90)])
         self.SideR.update_position([sr[0], sr[1], (self.rotation - 90)])
 
-        # Calculate line based sensor position
-        self.FrontDistanceSensor.update_position([fc[0], fc[1], self.rotation - 90])
-        self.RearDistanceSensor.update_position([rc[0], rc[1], self.rotation + 90])
-        self.RightDistanceSensor.update_position([sl[0], sl[1], self.rotation])
-        self.LeftDistanceSensor.update_position([sr[0], sr[1], self.rotation + 180])
+
+        # right + left side, little bit more to the front than sr, sl
+        move_fact = 0.4 # 0 is cemtre, 0.5 is front
+        fsl = self.c - sin * np.array([-self.height * move_fact, self.width / 2]) \
+             + cos * np.array([self.width / 2, self.height * move_fact])
+
+        fsr = self.c + sin * np.array([self.height * move_fact, self.width / 2]) \
+             + cos * np.array([-self.width / 2, self.height * move_fact])
 
         # Calculate line based sensor position
         self.FrontDistanceSensor.update_position_x1y1([fc[0], fc[1], self.rotation - 90])
         self.RearDistanceSensor.update_position_x1y1([rc[0], rc[1], self.rotation + 90])
-        self.RightDistanceSensor.update_position_x1y1([sl[0], sl[1], self.rotation])
-        self.LeftDistanceSensor.update_position_x1y1([sr[0], sr[1], self.rotation + 180])
+        self.RightDistanceSensor.update_position_x1y1([fsl[0], fsl[1], self.rotation])
+        self.LeftDistanceSensor.update_position_x1y1([fsr[0], fsr[1], self.rotation + 180])
 
     def reset(self):
         self.x = self.initPos[0]

@@ -43,21 +43,17 @@ class CriticModel(tf.keras.Model):
 
         neurons_inner_layer = 75
 
-        cell = tf.keras.layers.SimpleRNNCell(128)
-        self.RNNLayer = tf.keras.layers.RNN(cell)
-
         # critic part of model (value function)
-        self.inner1 = tf.keras.layers.Dense(neurons_inner_layer, activation='relu')
+        self.dense1 = tf.keras.layers.Dense(neurons_inner_layer, activation='relu')
         self.value = tf.keras.layers.Dense(observation_shape) # condense back into 2
 
-        self.opt = tf.keras.optimizers.Adagrad(learning_rate)
+        self.opt = tf.keras.optimizers.Adam(learning_rate)
         # self.opt = tf.compat.v1.train.AdamOptimizer(learning_rate, use_locking=True)
 
     def call(self, inputs):
         inputs = tf.expand_dims(inputs, axis=2)
-        x = self.RNNLayer(inputs)
-        y = self.inner1(x)
-        J = self.value(y)
+        x = self.dense1(inputs)
+        J = self.value(x)
         return J
 
 
@@ -65,22 +61,17 @@ class ActorModel(tf.keras.Model):
     def __init__(self, learning_rate, observation_shape):
         super(ActorModel, self).__init__()
         self.observation_shape = observation_shape
-        neurons_inner_layer = 100
+        neurons_inner_layer = 80
 
         # actor part of Model (policies)
-
-        cell = tf.keras.layers.SimpleRNNCell(512)
-        self.RNNLayer = tf.keras.layers.RNN(cell)
-        self.inner1 = tf.keras.layers.Dense(neurons_inner_layer, activation='relu')
+        self.dense1 = tf.keras.layers.Dense(neurons_inner_layer, activation='relu')
         self.turning = tf.keras.layers.Dense(1, activation=map_to_range)  # sigmoid for turning direction
 
-        self.opt = tf.keras.optimizers.Adagrad(learning_rate)
+        self.opt = tf.keras.optimizers.Adam(learning_rate)
 
     def call(self, inputs):
-        inputs = tf.expand_dims(inputs, axis=2)
-        x = self.RNNLayer(inputs)
-        y = self.inner1(x)
-        dir = self.turning(y)
+        x = self.dense1(inputs)
+        dir = self.turning(x)
         return dir
 
 
@@ -213,7 +204,7 @@ while run:
     if rewardavg > maxRewardSoFar:
         maxRewardSoFar = rewardavg
         correspCritic  = criticavg
-    print("- Highest reward yet {} - {} - ".format(maxRewardSoFar,correspCritic))
+    print("- Highest reward yet {} - {} - ".format(maxRewardSoFar, correspCritic))
     print("- Most recent run reward {} - {} - ".format(rewardavg,criticavg))
     if len(rewardavglist)>11:
         last = rewardavglist[-10:]

@@ -14,14 +14,14 @@ pyglet.resource.reindex()
 main_batch = pyglet.graphics.Batch()
 pyglet.gl.glClearColor(1, 1, 1, 1)
 
-
 class NodeManager():
     # TODO: Import
+    # TODO: Show first checkpoint
 
     # Improve user experience:
     # TODO: Don't deselect while dragging (hoooow)
     # TODO: Ctrl+z = remove most recent node
-    # TODO: Select most recent mode automatically
+    # TODO: Select most recent node automatically
     def __init__(self, batch):
         self.batch = batch
         self.dragging = False
@@ -74,6 +74,7 @@ class NodeManager():
     def activate_group(self, group):
         self.current_group.deactivate()
         self.current_group = group
+        # TODO: Exception for checkpoint here
         self.current_group_index = self.group_list.index(self.current_group)
         self.current_group.activate()
 
@@ -107,9 +108,9 @@ class NodeManager():
         self.car_node = CarNode(self.batch, self)
 
     def export(self):
-        f = open("exported.csv", "w+")
+        f = open('gym_carai/envs/resources/exported.csv', "w+")
         x, y, rot = self.car_node.get_position()
-        f.write("-1, {}, {}, {}, {}\n".format(x, y, rot, 0))  # write borders
+        f.write("-1, {}, {}, {}, 0, 0\n".format(x, y, rot))  # write borders
         for group in self.group_list:
             if len(group.nodes) > 1:
                 i_prev = -1
@@ -119,14 +120,28 @@ class NodeManager():
                     x2 = group.nodes[i].x_on_grid
                     y2 = group.nodes[i].y_on_grid
                     i_prev = i
-                    f.write("0, {}, {}, {}, {}\n".format(x1, y1, x2, y2))  # write borders
+                    f.write("0, {}, {}, {}, {}, {}\n".format(x1, y1, x2, y2, group.id))  # write borders
         for pair in self.CheckPointGroup.pairs:
             x1 = pair.node1.x_on_grid
             y1 = pair.node1.y_on_grid
             x2 = pair.node2.x_on_grid
             y2 = pair.node2.y_on_grid
-            f.write("1, {}, {}, {}, {}\n".format(x1, y1, x2, y2))  # write checkpoints
+            f.write("1, {}, {}, {}, {}, 0\n".format(x1, y1, x2, y2))  # write checkpoints
         f.close()
+
+    def import_file(self, file):
+        data = np.genfromtxt(file, delimiter=',')
+        for i in range(len(data)):
+            if data[i, 0] == -1:
+                self.car_node.update_pos(data[i, 1:4])
+
+                data.append(TrackBorder(track_data[i, 1:5], batch))
+            elif data[i, 0] == 1:
+
+                data.append(Checkpoint(track_data[i, 1:5], batch))
+            elif data[i, 0] == -1:
+
+                car_position = (track_data[i, 1:4])  # x, y, rotationone
 
 
 class NodeGroup:
@@ -237,12 +252,12 @@ class Node:
     def get_group(self):
         return self.NodeGroup
 
-    def update_pos(self, x, y):
+    def update_pos(self, x, y, rotation = 0):
         self.x = x
         self.y = y
         self.x_on_grid = NodeManager.grid_size * round(x / NodeManager.grid_size)
         self.y_on_grid = NodeManager.grid_size * round(y / NodeManager.grid_size)
-        self.sprite.update_pos(self.x_on_grid, self.y_on_grid)
+        self.sprite.update_pos(self.x_on_grid, self.y_on_grid, rotation=rotation)
 
     def select(self):
         self.sprite.update_color(self.selected_color)
@@ -596,6 +611,7 @@ def on_mouse_scroll(x, y, scroll_x, scroll_y):
 
 
 NodeManager = NodeManager(main_batch)
+NodeManager.import_file('gym_carai/envs/resources/exported.csv')
 
 def update(dt):
     current_grid_size_label.text = "Current grid size: " + str(NodeManager.grid_size)
