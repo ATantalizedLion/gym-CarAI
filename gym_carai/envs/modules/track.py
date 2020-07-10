@@ -19,6 +19,16 @@ class TrackBorder(LineObject):
         self.id = TrackBorder._counter
 
 
+class TrackCentre(LineObject):
+    _counter = 0
+    def __init__(self, pos, batch):
+        super().__init__(pos)
+        self.solid = 1
+        self.create_sprite(batch, color=(0, 100, 100))
+        TrackCentre._counter += 1
+        self.id = TrackCentre._counter
+
+
 class Checkpoint(LineObject):
     _counter = 0
 

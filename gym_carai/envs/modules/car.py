@@ -10,6 +10,20 @@ class Bumper(LineObject):
         super().__init__(pos)
         self.create_sprite(debug_batch, color=(0, 255, 255))
 
+    def update_position(self, pos):
+        # pos is either 3 long: x,y,theta, or 4 long, x1,y1,x2,y2
+        if len(pos) == 3:
+            self.x = pos[0]
+            self.y = pos[1]
+            self.rotation = pos[2]
+            self.rotation_rad = np.deg2rad(self.rotation)
+            if self.sprite is not None:
+                self.sprite.update_position_rot(-self.rotation, self.x, self.y)
+            self.x1 = self.x + np.cos(self.rotation_rad)*-self.width/2
+            self.x2 = self.x + np.cos(self.rotation_rad)*self.width/2
+            self.y1 = self.y + np.sin(self.rotation_rad)*self.width/2
+            self.y2 = self.y - np.sin(self.rotation_rad)*self.width/2
+
 class Sensor(LineObject):
     def __init__(self, pos, debug_batch, sensor_range):
         super().__init__(pos, height=2)
@@ -116,10 +130,10 @@ class Car:
              - cos * np.array([-self.width / 2, 0.0])
         sr = self.c + sin * np.array([0.0, self.width / 2]) \
              + cos * np.array([-self.width / 2, 0.0])
-        self.Bumper.update_position([fc[0], fc[1], -self.rotation])
-        self.Rear.update_position([rc[0], rc[1], -self.rotation])
-        self.SideL.update_position([sl[0], sl[1], -(self.rotation - 90)])
-        self.SideR.update_position([sr[0], sr[1], -(self.rotation - 90)])
+        self.Bumper.update_position([fc[0], fc[1], self.rotation])
+        self.Rear.update_position([rc[0], rc[1], self.rotation])
+        self.SideL.update_position([sl[0], sl[1], (self.rotation - 90)])
+        self.SideR.update_position([sr[0], sr[1], (self.rotation - 90)])
 
         # Calculate line based sensor position
         self.FrontDistanceSensor.update_position([fc[0], fc[1], self.rotation - 90])

@@ -11,7 +11,7 @@ from gym_carai.envs.modules.viewer import Viewer
 pyglet.options['debug_gl'] = False  # performance increase
 window_h_size = 1920
 window_v_size = 1080
-debug = 0 # renders all bumpers, sensors and collision markers.
+debug = 1  # renders all bumpers, sensors and collision markers.
 
 
 class SimpleCarAIEnv(gym.Env):
@@ -50,6 +50,7 @@ class SimpleCarAIEnv(gym.Env):
         self.action_space = spaces.Box(np.array([-1]), np.array([+1]))  # steering only, -1 to +1 on one action
 
         self.track_name = 'simpleSquareTrack'
+        self.track_name = 'exported'
 
         # define functions
         self.walls, self.checkpoints, car_position = generate_track(
