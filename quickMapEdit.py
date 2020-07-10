@@ -16,12 +16,12 @@ pyglet.gl.glClearColor(1, 1, 1, 1)
 
 
 class NodeManager():
-    # TODO: Export to csv function
-    # TODO: Initial Position Car
+    # TODO: Import
 
     # Improve user experience:
     # TODO: Don't deselect while dragging (hoooow)
-
+    # TODO: Ctrl+z = remove most recent node
+    # TODO: Select most recent mode automatically
     def __init__(self, batch):
         self.batch = batch
         self.dragging = False

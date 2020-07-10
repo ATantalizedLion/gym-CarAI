@@ -2,12 +2,12 @@ import gym
 import gym_carai
 import time
 import numpy as np
-import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # this line forces to run on CPU
+# import os
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # this line forces to run on CPU
 import tensorflow as tf
-# print(tf.config.experimental.list_physical_devices('GPU') )  # show all gpus
-# print(tf.__version__)  # show tf version
-
+print(tf.config.experimental.list_physical_devices('GPU') )  # show all gpus
+print(tf.__version__)  # show tf version
+tf.keras.backend.set_floatx('float32')
 
 def map_to_range(x, min_out=-1, max_out=1) :
     # custom
@@ -41,16 +41,23 @@ class CriticModel(tf.keras.Model):
     def __init__(self, learning_rate, observation_shape):
         super(CriticModel, self).__init__()
 
+        neurons_inner_layer = 75
+
+        cell = tf.keras.layers.SimpleRNNCell(128)
+        self.RNNLayer = tf.keras.layers.RNN(cell)
+
         # critic part of model (value function)
-        self.inner1 = tf.keras.layers.Dense(100, activation='relu')
+        self.inner1 = tf.keras.layers.Dense(neurons_inner_layer, activation='relu')
         self.value = tf.keras.layers.Dense(observation_shape) # condense back into 2
 
-        self.opt = tf.keras.optimizers.Adamax(learning_rate)
+        self.opt = tf.keras.optimizers.Adagrad(learning_rate)
         # self.opt = tf.compat.v1.train.AdamOptimizer(learning_rate, use_locking=True)
 
     def call(self, inputs):
-        x = self.inner1(inputs)
-        J = self.value(x)
+        inputs = tf.expand_dims(inputs, axis=2)
+        x = self.RNNLayer(inputs)
+        y = self.inner1(x)
+        J = self.value(y)
         return J
 
 
@@ -58,16 +65,22 @@ class ActorModel(tf.keras.Model):
     def __init__(self, learning_rate, observation_shape):
         super(ActorModel, self).__init__()
         self.observation_shape = observation_shape
+        neurons_inner_layer = 100
 
         # actor part of Model (policies)
-        self.inner1 = tf.keras.layers.Dense(100, activation='relu')
+
+        cell = tf.keras.layers.SimpleRNNCell(512)
+        self.RNNLayer = tf.keras.layers.RNN(cell)
+        self.inner1 = tf.keras.layers.Dense(neurons_inner_layer, activation='relu')
         self.turning = tf.keras.layers.Dense(1, activation=map_to_range)  # sigmoid for turning direction
 
-        self.opt = tf.keras.optimizers.Adamax(learning_rate)
+        self.opt = tf.keras.optimizers.Adagrad(learning_rate)
 
     def call(self, inputs):
-        x = self.inner1(inputs)
-        dir = self.turning(x)
+        inputs = tf.expand_dims(inputs, axis=2)
+        x = self.RNNLayer(inputs)
+        y = self.inner1(x)
+        dir = self.turning(y)
         return dir
 
 
@@ -134,13 +147,13 @@ observation_shape = env.observation_space.shape[0]
 
 start_time = time.time()           # Register current time
 epoch = 1                          # Current episode
-maxEpoch = 100                     # max amount of epochs
-maxEpochTime = 500                 # [s] max seconds to spend per epoch
+maxEpoch = 100000                     # max amount of epochs
+maxEpochTime = 120                 # [s] max seconds to spend per epoch
 dt = 1/60                          # fps (should equal monitor refresh rate)
 maxSteps = int(maxEpochTime/dt)    # max duration of an epoch
 Terminate = None
 done = 0
-learning_rate = 0.001
+learning_rate = 0.0005
 mem = Memory()
 run = True
 Actor = ActorModel(learning_rate, observation_shape)  # global network
@@ -163,7 +176,7 @@ while run:
 
     for i in range(maxSteps):
         # calculate next step
-        env.render('human')  # manual, human, rgb_array
+        env.render('human')  # manual, human, human-vsync, rgb_array
         action = Actor(obs).numpy()[0]  # returns 0,1,2, action space = -1 to 1
         obs, reward, done, info_dict, Terminate = env.step(action, dt)
         mem.store(obs, action[0], reward, info_dict['JStar'])

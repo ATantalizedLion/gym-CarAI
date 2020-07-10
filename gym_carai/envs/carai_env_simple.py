@@ -35,12 +35,11 @@ class SimpleCarAIEnv(gym.Env):
         # Labels for score and level, scaled based upon score label font size
         self.score = 0
         self.t = 0
-        self.episode = 0
+        self.episode = 1
 
         self.done = 0
         self.reward = 0
         self.JStar = 0
-        self.observations = np.array([[0, 0]])
 
         self.score_label = None
         self.track_label = None
@@ -69,6 +68,8 @@ class SimpleCarAIEnv(gym.Env):
         #                 self.car_obj.RearDistanceSensor, self.car_obj.LeftDistanceSensor]
         self.sensors = [self.car_obj.RightDistanceSensor, self.car_obj.LeftDistanceSensor,
                         self.car_obj.FrontDistanceSensor]
+
+        self.sensors = [self.car_obj.RightDistanceSensor]
 
         self.observation_space = spaces.Box(np.zeros(len(self.sensors)),
                                             self.car_obj.sensorRange*np.ones(len(self.sensors)))
@@ -140,7 +141,7 @@ class SimpleCarAIEnv(gym.Env):
                 self.Terminate = self.viewer.Terminate
 
         if self.done:
-            self.reward = -50 - 100/self.t  # penalty for hitting wall, higher penalty if wall is hit early
+            self.reward = -50 # - 100/self.t  # penalty for hitting wall, higher penalty if wall is hit early
 
         self.JStar = 0  # All rewards are negative so JStar is zero.
         return self.observations, self.reward, self.done, {'t': self.t, 'JStar': self.JStar}, self.Terminate

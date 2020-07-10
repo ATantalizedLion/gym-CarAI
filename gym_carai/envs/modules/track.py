@@ -20,13 +20,10 @@ class TrackBorder(LineObject):
 
 
 class TrackCentre(LineObject):
-    _counter = 0
     def __init__(self, pos, batch):
         super().__init__(pos)
         self.solid = 1
         self.create_sprite(batch, color=(0, 100, 100))
-        TrackCentre._counter += 1
-        self.id = TrackCentre._counter
 
 
 class Checkpoint(LineObject):
@@ -43,6 +40,7 @@ class Checkpoint(LineObject):
 def generate_track(filename, batch):
     track_objects = []
     checkpoints = []
+    car_position = None
     track_data = read_track(filename)
     for i in range(len(track_data)):
         if track_data[i, 0] == 0:

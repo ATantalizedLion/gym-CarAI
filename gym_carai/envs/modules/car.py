@@ -54,11 +54,11 @@ class Car:
         self.acc = 0.0
 
         self.mode = mode
-        self.sensorRange = 1920
+        self.sensorRange = 1000
 
         # related to controls
         self.key_handler = key.KeyStateHandler()
-        self.rotate_speed = 180.0
+        self.rotate_speed = 150.0
         self.acc_speed = 300.0
 
         # set up bumpers
