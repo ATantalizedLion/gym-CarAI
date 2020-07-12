@@ -7,7 +7,7 @@ from gym_carai.envs.modules.track import generate_track
 from gym_carai.envs.modules.car import Car
 from gym_carai.envs.modules.util import line_overlapping, vector_length
 from gym_carai.envs.modules.viewer import Viewer
-
+import time
 pyglet.options['debug_gl'] = False  # performance increase
 window_h_size = 1920
 window_v_size = 1080
@@ -63,8 +63,7 @@ class SimpleCarAIEnv(gym.Env):
             'gym_carai/envs/resources/' + self.track_name + '.csv', self.track_batch)
         self.current_checkpoint = 1
 
-        self.car_obj = Car(car_position, debug_batch=self.debug_batch, mode='simple')
-        self.car_obj.sprite.batch = self.main_batch
+        self.car_obj = Car(car_position, debug_batch=self.debug_batch, main_batch=self.main_batch, mode='simple')
         self.car_bumpers = [self.car_obj.Bumper, self.car_obj.SideL, self.car_obj.SideR, self.car_obj.Rear]
 
         # all objects requiring .update()
@@ -98,43 +97,33 @@ class SimpleCarAIEnv(gym.Env):
 
         for obj in self.envObjects:
             obj.update(dt, action)
-
         for obj in self.walls:
             for car_bumper in self.car_bumpers:
-                tf, _, _, _, _, _, _ = line_overlapping(car_bumper.line(), obj.line())
+                tf = line_overlapping(car_bumper.line(), obj.line())
                 if tf:
                     self.done = 1
-
         for obj in self.checkpoints:
-            for car_bumper in self.car_bumpers:
-                if obj.id == self.current_checkpoint:
-                    tf, _, _, _, _, _, _ = line_overlapping(car_bumper.line(), obj.line())
+            if obj.id == self.current_checkpoint:
+                for car_bumper in self.car_bumpers:
+                    tf = line_overlapping(car_bumper.line(), obj.line())
                     if tf:
                         self.current_checkpoint += 1
                         if self.current_checkpoint > len(self.checkpoints):
                             self.current_checkpoint -= len(self.checkpoints)
                         self.reward = 0
                         self.score_label.text = "Current Score: " + str(self.score)
-
         current_sensor_number = 0
         for sensor in self.sensors:
             min_distance = sensor.sensor_range
-            dist = min_distance
-            col_loc = [-50, -50]  # give some value
+            closest_col_loc = [-50, -50]
             for obj in self.walls:
-                tf, p, q, t, r, u, s = line_overlapping(sensor.line(), obj.line())
-                if tf:
-                    dist = vector_length(p, p + t * r)
+                tf, dist, col_loc = line_overlapping(sensor.line(), obj.line(), get_dist=True, printT=True)
+                if dist is not None and tf is True:
                     if dist < min_distance:
                         min_distance = dist
-                        col_loc = p + t * r
-            if dist < 900000:
-                sensor.collision_marker.x = col_loc[0]
-                sensor.collision_marker.y = col_loc[1]
-            else:
-                # no collision found, draw off-screen
-                sensor.collision_marker.x = -50
-                sensor.collision_marker.y = -50
+                        closest_col_loc = col_loc
+            sensor.collision_marker.x = closest_col_loc[0]
+            sensor.collision_marker.y = closest_col_loc[1]
             self.observations[0][current_sensor_number] = min_distance
             current_sensor_number += 1
         self.t += dt
@@ -145,8 +134,7 @@ class SimpleCarAIEnv(gym.Env):
                 self.Terminate = self.viewer.Terminate
 
         if self.done:
-            self.reward = -50 # - 100/self.t  # penalty for hitting wall, higher penalty if wall is hit early
-
+            self.reward = -50  # - 100/self.t  # penalty for hitting wall, higher penalty if wall is hit early
         self.JStar = 0  # All rewards are negative so JStar is zero.
         return self.observations, self.reward, self.done, {'t': self.t, 'JStar': self.JStar}, self.Terminate
 

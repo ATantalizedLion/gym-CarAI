@@ -2,6 +2,7 @@ import numpy as np
 import pyglet
 from gym_carai.envs.modules.render import Rect, Line
 
+
 def center_image(image):
     """ Sets an image's anchor point to the center """
     image.anchor_x = image.width // 2
@@ -12,54 +13,46 @@ def vector_length(p1, p2):
     return np.sqrt((p1[0]-p2[0])**2+(p1[1]-p2[1])**2)
 
 
-def line_overlapping(line1, line2):
+def line_overlapping(line1, line2, get_dist=False, printT=False):
     """ Where each line(segment) is a list containing a start and end position
     e.g. line1 = [x1 y1 x2 y2]
-         line1 = [x3 y3 x4 y4]
-         get_distance determines whether or not to return the distance, = 0 reduces unnecessary computations
-         get_distance = 1 returns the distance between the center of line 1 and its intersection with line 2"""
-    p = line1[0:2]
-    r = line1[2:4] - p
+         line2 = [x3 y3 x4 y4]"""
+    aX = line1[0]
+    aY = line1[1]
+    bX = line1[2]
+    bY = line1[3]
+    cX = line2[0]
+    cY = line2[1]
+    dX = line2[2]
+    dY = line2[3]
 
-    q = line2[0:2]
-    s = line2[2:4] - q
-
-    rs = np.cross(r, s)
-    if rs == 0:
-        return False, 0, 0, 0, 0, 0, 0
-    qpr = np.cross((q-p), r)
-
-    t = np.cross((q-p), s)/rs
-
-    u = qpr/np.cross(r, s)
-
-    if rs == 0 and qpr == 0:
-        # collinear
-        t0 = qpr / np.cross(r, r)
-        t1 = t0 + np.cross(s, np.cross(r, r))
-        if np.dot(s, r) > 0:
-            # check interval t0,t1
-            a = np.array([t0, t1])
-            b = np.array([0, 1])
+    denom = ((bX - aX) * (dY - cY)) - ((bY - aY) * (dX - cX))
+    num1 = ((aY - cY) * (dX - cX)) - ((aX - cX) * (dY - cY))
+    num2 = ((aY - cY) * (bX - aX)) - ((aX - cX) * (bY - aY))
+    if get_dist:
+        if denom == 0:
+            if num1 == 0 and num2 == 0:
+                return True, None, None
+            else:
+                return False, None, None
+        r = num1/denom
+        s = num2/denom
+        if (0 <= r <= 1) and (0 <= s <= 1):
+            return True, abs(r*np.sqrt((aX-bX)**2 + (aY-bY)**2)), [aX+r*(bX-aX), aY+r*(bY-aY)]
         else:
-            # check interval t1, t0
-            a = np.array([t1, t0])
-            b = np.array([0, 1])
-        if b[0] > a[1] or a[0] > b[0]:
-            # print(a, b, 'False')
-            return False, p, q, t, r, u, s
-        else:
-            # print(a, b, 'True')
-            return True, t, r, u, s
-    elif rs == 0 and qpr != 0:
-        return False, p, q, t, r, u, s
-    elif rs != 0 and 0 < t < 1 and 0 < u < 1:
-        # meet at p+t*r, q+u*s
-        return True, p, q, t, r, u, s
+            return False, abs(r*np.sqrt((aX-bX)**2 + (aY-bY)**2)), [aX+r*(bX-aX), aY+r*(bY-aY)]
     else:
-        # not parallel, but do not intersect
-        return False, p, q, t, r, u, s
-
+        if denom == 0:
+            if num1 == 0 and num2 == 0:
+                return True
+            else:
+                return False
+        r = num1/denom
+        s = num2/denom
+        if (0 <= r <= 1) and (0 <= s <= 1):
+            return True
+        else:
+            return False
 
 class LineObject:
     def __init__(self, pos, height=4):

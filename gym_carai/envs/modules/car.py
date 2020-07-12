@@ -1,6 +1,5 @@
 import pyglet
 import numpy as np
-
 from gym_carai.envs.modules.util import center_image, LineObject
 from pyglet.window import key
 
@@ -42,7 +41,7 @@ class Car:
         self.x = initial_position[0]
         self.y = initial_position[1]
         self.c = np.array([self.x, self.y])
-        self.sprite = pyglet.sprite.Sprite(img=self.image, x=self.x, y=self.y)
+        self.sprite = pyglet.sprite.Sprite(img=self.image, x=self.x, y=self.y, batch=main_batch)
         self.sprite.scale = car_length / self.image.height
         self.width = self.sprite.width
         self.height = self.sprite.height
