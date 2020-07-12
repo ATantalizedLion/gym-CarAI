@@ -8,16 +8,22 @@ pyglet.options['debug_gl'] = False  # minor performance increase
 window_h_size = 1920
 window_v_size = 1080
 window = pyglet.window.Window(width=1920, height=1080)
-pyglet.resource.path = ['gym_carai/envs/resources']
+pyglet.resource.path = ['']  # ['gym_carai/envs/resources']
 pyglet.resource.reindex()
 
 main_batch = pyglet.graphics.Batch()
 pyglet.gl.glClearColor(1, 1, 1, 1)
 
-import_filename = 'gym_carai/envs/resources/roundSimpleTrack.csv'    # None to disable
-export_filename = 'gym_carai/envs/resources/exported_exp.csv'
 
+imp = input('Import an existing track?\n')
+if imp == 'y' or imp == 'Y':
+    import_filename = input('Track filename (exclusing extension)\n') # e.g. 'roundSimpleTrack.csv'
+    import_filename = import_filename + '.csv'
+else:
+    import_filename = None  # None to disable
 
+# TODO: Make program ask for wanted save file name, for now always the following:
+export_filename = 'exported_track.csv'
 
 class NodeManager():
     # TODO: Show first checkpoint
