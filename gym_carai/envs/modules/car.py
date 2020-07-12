@@ -28,7 +28,6 @@ class Sensor(LineObject):
     def __init__(self, pos, debug_batch, sensor_range):
         super().__init__(pos, height=2)
         self.create_sprite(debug_batch, color=(0, 0, 255))
-        # TODO: Create 'X' class
         self.colimg = pyglet.resource.image('marker.png')
         center_image(self.colimg)
         self.collision_marker = pyglet.sprite.Sprite(img=self.colimg, x=-10, y=-10, batch=debug_batch)
@@ -137,7 +136,7 @@ class Car:
 
 
         # right + left side, little bit more to the front than sr, sl
-        move_fact = 0.4 # 0 is cemtre, 0.5 is front
+        move_fact = 0.4  # 0 is cemtre, 0.5 is front
         fsl = self.c - sin * np.array([-self.height * move_fact, self.width / 2]) \
              + cos * np.array([self.width / 2, self.height * move_fact])
 

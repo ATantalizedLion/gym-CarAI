@@ -12,11 +12,17 @@ pyglet.options['debug_gl'] = False  # performance increase
 window_h_size = 1920
 window_v_size = 1080
 debug = 1  # renders all bumpers, sensors and collision markers.
+# TODO: Differentiate tickrate and fps?
 
 
 class SimpleCarAIEnv(gym.Env):
     metadata = {'render.modes': ['human', 'human-vsync', 'rgb_array', 'manual'], 'video.frames_per_second': 60}
-
+    '''
+    human - displays the environment, no vsync, timestep as fast as possible, 
+    human-vsync - displays the environment, vsync 
+    rgb_array - Outputs rgb array instead of rendering
+    manual - human-vsync but actions are taken from arrow keys and not from the inputs. Testing mode. 
+    '''
     def __init__(self):
         pyglet.resource.path = ['gym_carai/envs/resources']
         pyglet.resource.reindex()
@@ -28,6 +34,8 @@ class SimpleCarAIEnv(gym.Env):
         self.vsync = False
 
         # 3 batches, one for car, one for obstacles, one for debug features
+        # TODO: Move into batches with groups instead. - might not be worth the performance improvent due to the amount
+        #  of code requiring refactoring
         self.main_batch = pyglet.graphics.Batch()
         self.track_batch = pyglet.graphics.Batch()
         self.debug_batch = pyglet.graphics.Batch()
@@ -48,8 +56,7 @@ class SimpleCarAIEnv(gym.Env):
 
         self.action_space = spaces.Box(np.array([-1]), np.array([+1]))  # steering only, -1 to +1 on one action
 
-        self.track_name = 'simpleSquareTrack'
-        self.track_name = 'exported'
+        self.track_name = 'roundSimpleTrack'
 
         # define functions
         self.walls, self.checkpoints, car_position = generate_track(
@@ -66,9 +73,6 @@ class SimpleCarAIEnv(gym.Env):
         # implemented in this env:
         # self.sensors = [self.car_obj.FrontDistanceSensor, self.car_obj.RightDistanceSensor,
         #                 self.car_obj.RearDistanceSensor, self.car_obj.LeftDistanceSensor]
-        self.sensors = [self.car_obj.RightDistanceSensor, self.car_obj.LeftDistanceSensor,
-                        self.car_obj.FrontDistanceSensor]
-
         self.sensors = [self.car_obj.RightDistanceSensor]
 
         self.observation_space = spaces.Box(np.zeros(len(self.sensors)),

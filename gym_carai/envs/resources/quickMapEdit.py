@@ -14,34 +14,40 @@ pyglet.resource.reindex()
 main_batch = pyglet.graphics.Batch()
 pyglet.gl.glClearColor(1, 1, 1, 1)
 
+import_filename = 'gym_carai/envs/resources/roundSimpleTrack.csv'    # None to disable
+export_filename = 'gym_carai/envs/resources/exported_exp.csv'
+
+
+
 class NodeManager():
-    # TODO: Import
     # TODO: Show first checkpoint
 
     # Improve user experience:
     # TODO: Don't deselect while dragging (hoooow)
-    # TODO: Ctrl+z = remove most recent node
-    # TODO: Select most recent node automatically
-    def __init__(self, batch):
+    def __init__(self, import_filename, export_filename, batch):
         self.batch = batch
         self.dragging = False
         self.node_groups = 0
         self.group_list = []
         self.create_group()
+        self.import_filename = import_filename
+        self.export_filename = export_filename
         self.current_group_index = 0
         self.current_group = self.group_list[self.current_group_index]
         self.grid_sizes = [1, 5, 10, 20, 25, 50, 75, 100, 200]
-        self.grid_num = 4
+        self.grid_num = 0
         self.grid_size = self.grid_sizes[self.grid_num]
-        self.CheckPointGroup = CheckPointGroup(batch)
+        self.CheckPointGroup = CheckPointGroup(batch, self)
         self.gen_car_node()
         self.car_under_mouse = None
+        if import_filename is not None:
+            self.import_file(import_filename)
 
     def get_groups(self):
         return self.group_list + [self.CheckPointGroup]
 
     def create_group(self):
-        self.group_list.append(NodeGroup(self.batch, self.node_groups))
+        self.group_list.append(NodeGroup(self.batch, self.node_groups, self))
         self.node_groups += 1
 
     def next_group(self):
@@ -74,8 +80,10 @@ class NodeManager():
     def activate_group(self, group):
         self.current_group.deactivate()
         self.current_group = group
-        # TODO: Exception for checkpoint here
-        self.current_group_index = self.group_list.index(self.current_group)
+        if group.type == 0:
+            self.current_group_index = self.group_list.index(self.current_group)
+        else:
+            self.current_group_index = -1
         self.current_group.activate()
 
     def delete_group(self):
@@ -133,26 +141,40 @@ class NodeManager():
         data = np.genfromtxt(file, delimiter=',')
         for i in range(len(data)):
             if data[i, 0] == -1:
-                self.car_node.update_pos(data[i, 1:4])
-
-                data.append(TrackBorder(track_data[i, 1:5], batch))
+                self.car_node.update_pos(data[i, 1], data[i, 2], data[i, 3])
+            elif data[i, 0] == 0:
+                group_match = 0
+                while group_match < 1:
+                    if data[i, 5] > self.current_group.id:
+                        self.next_group()
+                    elif data[i, 5] < self.current_group.id:
+                        self.prev_group()
+                    else:
+                        group_match = 1
+                node_vec1 = [data[i, 1], data[i, 2]]
+                node_vec2 = [data[i, 3], data[i, 4]]
+                node_vecs = [node_vec1, node_vec2]
+                for node_vec in node_vecs:
+                    if node_vec not in self.current_group.node_gen_history:
+                        self.current_group.create_node(node_vec[0], node_vec[1])
+                        self.current_group.node_gen_history.append(node_vec)
             elif data[i, 0] == 1:
-
-                data.append(Checkpoint(track_data[i, 1:5], batch))
-            elif data[i, 0] == -1:
-
-                car_position = (track_data[i, 1:4])  # x, y, rotationone
-
+                self.CheckPointGroup.create_node(data[i, 1], data[i, 2], data[i, 3], data[i, 4])
+            self.CheckPointGroup.gen_track()
+            self.CheckPointGroup.deactivate()
 
 class NodeGroup:
-    def __init__(self, batch, id):
+    def __init__(self, batch, id, NodeManager):
         self.id = id
         self.batch = batch
         self.latest_node = 0
         self.nodes = []
         self.nodes_under_mouse = []
         self.tracks = []
+        self.NodeManager = NodeManager
+        self.type = 0  # type 0 = regular, 1 = checkpoint
         self.current_node = None
+        self.node_gen_history = []
 
     def create_node(self, x, y):
         node = Node(x, y, self.batch, self.latest_node, NodeGroup=self)
@@ -162,6 +184,7 @@ class NodeGroup:
             self.nodes.insert(self.nodes.index(self.current_node), node)
         if len(self.nodes) > 2:
             self.gen_track()
+        self.select_node(node)
         self.latest_node += 1
         return node
 
@@ -255,8 +278,8 @@ class Node:
     def update_pos(self, x, y, rotation = 0):
         self.x = x
         self.y = y
-        self.x_on_grid = NodeManager.grid_size * round(x / NodeManager.grid_size)
-        self.y_on_grid = NodeManager.grid_size * round(y / NodeManager.grid_size)
+        self.x_on_grid = self.NodeGroup.NodeManager.grid_size * round(x / self.NodeGroup.NodeManager.grid_size)
+        self.y_on_grid = self.NodeGroup.NodeManager.grid_size * round(y / self.NodeGroup.NodeManager.grid_size)
         self.sprite.update_pos(self.x_on_grid, self.y_on_grid, rotation=rotation)
 
     def select(self):
@@ -283,14 +306,16 @@ class Node:
 
 class CheckPointGroup:
 
-    def __init__(self, batch):
-        '''Acts like a regular group, but intercepts all node calls to checkpoint pair calls, which combine the
+    def __init__(self, batch, NodeManager):
+        '''Interfaces like a regular group, but intercepts all node calls to checkpoint pair calls, which combine the
         two nodes of a checkpoint '''
         self.id = id
         self.batch = batch
         self.latest_pair = 0
         self.nodes_under_mouse = []
+        self.NodeManager = NodeManager
         self.tracks = []
+        self.type = 1  # type 0 = regular, 1 = checkpoint
         self.current_node = None
         self.pairs = []  # contains objects linking two checkpoint nodes.
         self.current_pair = None
@@ -305,13 +330,14 @@ class CheckPointGroup:
     def get_current_pair(self):
         return self.current_pair
 
-    def create_node(self, x, y): # Actually creates a pair!
-        pair = CheckPointPair(x, y, self.batch, self.latest_pair, self)
+    def create_node(self, x, y, x2=None, y2 =None): # Actually creates a pair!
+        pair = CheckPointPair(x, y, x2, y2, self.batch, self.latest_pair, self)
         if self.current_pair is None:
             self.pairs.append(pair)
         else:
             self.pairs.insert(self.pairs.index(self.current_pair), pair)
         self.latest_pair += 1
+        self.select_node(pair.node1)
 
     def del_track(self):
         for track in self.tracks:
@@ -385,13 +411,17 @@ class CheckPointGroup:
             self.delete_pair(self.pairs[i].id)
 
 class CheckPointPair:
-    def __init__(self, x, y, batch, id, CheckPointGroup):
+    def __init__(self, x, y, x2, y2, batch, id, CheckPointGroup):
         self.default_dist = 100
         self.CheckPointGroup = CheckPointGroup
         self.id = id
         self.selected = False
-        self.node1 = CheckPointNode(x-self.default_dist, y, batch, 1, self)
-        self.node2 = CheckPointNode(x+self.default_dist, y, batch, 2, self)
+        if x2 is not None and y2 is not None:
+            self.node1 = CheckPointNode(x, y, batch, 1, self)
+            self.node2 = CheckPointNode(x2, y2, batch, 1, self)
+        else:
+            self.node1 = CheckPointNode(x-self.default_dist, y, batch, 1, self)
+            self.node2 = CheckPointNode(x+self.default_dist, y, batch, 2, self)
         self.nodes = [self.node1, self.node2]
 
     def select(self):
@@ -450,8 +480,9 @@ class CheckPointNode():
     def update_pos(self, x, y):
         self.x = x
         self.y = y
-        self.x_on_grid = NodeManager.grid_size * round(x / NodeManager.grid_size)
-        self.y_on_grid = NodeManager.grid_size * round(y / NodeManager.grid_size)
+        grid = self.CheckPointPair.CheckPointGroup.NodeManager.grid_size
+        self.x_on_grid = grid * round(x / grid)
+        self.y_on_grid = grid * round(y / grid)
         self.sprite.update_pos(self.x_on_grid, self.y_on_grid)
 
     def select(self):
@@ -507,14 +538,15 @@ class CarNode:
         else:
             return False
 
-    def update_pos(self, x, y):
+    def update_pos(self, x, y, rotation=0):
         self.x = x
         self.y = y
+        self.rotation = rotation
         self.x_on_grid = self.NodeManager.grid_size * round(x / self.NodeManager.grid_size)
         self.y_on_grid = self.NodeManager.grid_size * round(y / self.NodeManager.grid_size)
         self.sprite.x = self.x_on_grid
         self.sprite.y = self.y_on_grid
-
+        self.sprite.rotation = rotation
 
 @window.event
 def on_draw():
@@ -610,8 +642,7 @@ def on_mouse_scroll(x, y, scroll_x, scroll_y):
         NodeManager.decrease_grid()
 
 
-NodeManager = NodeManager(main_batch)
-NodeManager.import_file('gym_carai/envs/resources/exported.csv')
+NodeManager = NodeManager(import_filename, export_filename, main_batch)
 
 def update(dt):
     current_grid_size_label.text = "Current grid size: " + str(NodeManager.grid_size)
