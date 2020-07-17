@@ -17,15 +17,8 @@ def line_overlapping(line1, line2, get_dist=False, printT=False):
     """ Where each line(segment) is a list containing a start and end position
     e.g. line1 = [x1 y1 x2 y2]
          line2 = [x3 y3 x4 y4]"""
-    aX = line1[0]
-    aY = line1[1]
-    bX = line1[2]
-    bY = line1[3]
-    cX = line2[0]
-    cY = line2[1]
-    dX = line2[2]
-    dY = line2[3]
-
+    aX, aY, bX, bY = line1
+    cX, cY, dX, dY = line2
     denom = ((bX - aX) * (dY - cY)) - ((bY - aY) * (dX - cX))
     num1 = ((aY - cY) * (dX - cX)) - ((aX - cX) * (dY - cY))
     num2 = ((aY - cY) * (bX - aX)) - ((aX - cX) * (bY - aY))
@@ -57,10 +50,7 @@ def line_overlapping(line1, line2, get_dist=False, printT=False):
 class LineObject:
     def __init__(self, pos, height=4):
         # Load Pos Data
-        self.x1 = pos[0]
-        self.y1 = pos[1]
-        self.x2 = pos[2]
-        self.y2 = pos[3]
+        self.x1, self.y1, self.x2, self.y2 = pos
 
         # Generate Geometrical data of line
         self.x = (self.x1 + self.x2)/2
@@ -86,24 +76,21 @@ class LineObject:
     def update_position(self, pos):
         # pos is either 3 long: x,y,theta, or 4 long, x1,y1,x2,y2
         if len(pos) == 3:
-            self.x = pos[0]
-            self.y = pos[1]
-            self.rotation = pos[2]
+            self.x, self.y, self.rotation = pos
             self.rotation_rad = np.deg2rad(self.rotation)
 
             if self.sprite is not None:
                 self.sprite.update_position_rot(self.rotation, self.x, self.y)
 
-            self.x1 = self.x + np.cos(self.rotation_rad)*-self.width/2
-            self.x2 = self.x + np.cos(self.rotation_rad)*self.width/2
-            self.y1 = self.y + np.sin(self.rotation_rad)*self.width/2
-            self.y2 = self.y - np.sin(self.rotation_rad)*self.width/2
+            c = np.cos(self.rotation_rad)
+            s = np.sin(self.rotation_rad)
+            self.x1 = self.x + c*-self.width/2
+            self.x2 = self.x + c*self.width/2
+            self.y1 = self.y + s*self.width/2
+            self.y2 = self.y - s*self.width/2
 
         if len(pos) == 4:
-            self.x1 = pos[0]
-            self.y1 = pos[1]
-            self.x2 = pos[2]
-            self.y2 = pos[3]
+            self.x1, self.y1, self.x2, self.y2 = pos
             self.x = (self.x1 + self.x2)/2
             self.y = (self.y1 + self.y2)/2
             self.width = round(np.sqrt((self.x1-self.x2)**2+(self.y1-self.y2)**2))
@@ -117,15 +104,16 @@ class LineObject:
                 self.sprite.update_position(self.x1, self.y1, self.x2, self.y2)
 
     def update_position_x1y1(self, pos):
-        self.x1 = pos[0]
-        self.y1 = pos[1]
-        self.rotation = pos[2]
-        self.rotation_rad = np.deg2rad(pos[2])
-
-        self.x = self.x1 - np.cos(self.rotation_rad) * -self.width / 2
-        self.x2 = self.x + np.cos(self.rotation_rad) * self.width / 2
-        self.y = self.y1 - np.sin(self.rotation_rad) * self.width / 2
-        self.y2 = self.y - np.sin(self.rotation_rad) * self.width / 2
+        ''' Update position based on x1, y1 and rotation, exists for the sensors.'''
+        self.x1, self.y1, self.rotation = pos
+        self.rotation -= 90
+        self.rotation_rad = np.deg2rad(self.rotation)
+        c = np.cos(self.rotation_rad)
+        s = np.sin(self.rotation_rad)
+        self.x = self.x1 - c * -self.width / 2
+        self.x2 = self.x + c * self.width / 2
+        self.y = self.y1 - s * self.width / 2
+        self.y2 = self.y - s * self.width / 2
 
         if self.sprite is not None:
             self.sprite.update_position(self.x1, self.y1, self.x2, self.y2)

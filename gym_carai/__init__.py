@@ -8,3 +8,7 @@ register(
     id='carai-simple-v0',
     entry_point='gym_carai.envs:SimpleCarAIEnv',
 )
+register(
+    id='carai-less-simple-v0',
+    entry_point='gym_carai.envs:LessSimpleCarAIEnv',
+)

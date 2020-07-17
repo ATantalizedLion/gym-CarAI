@@ -23,15 +23,14 @@ class Viewer():
     def render(self, return_rgb_array=False):
         self.window.clear()
         self.window.dispatch_events()
-        if self.vsync:
+        if self.vsync:  # make prettier since framerate does not need to be maximized
             pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
             pyglet.gl.glEnable(pyglet.gl.GL_LINE_SMOOTH)
             pyglet.gl.glHint(pyglet.gl.GL_LINE_SMOOTH_HINT, pyglet.gl.GL_DONT_CARE)
-        # self.transform.enable()
         for batch in self.toDraw:
             batch.draw()
 
-        # write rgb array as in classic control framework
+        # write rgb array as in done in OpenAI classic control framework
         arr = None
         if return_rgb_array:
             buffer = pyglet.image.get_buffer_manager().get_color_buffer()
@@ -52,22 +51,13 @@ class Viewer():
             self.window.close()
             self.is_open = False
 
-    def labels(self, main_batch, score_label_font_size, score, track_name, time, episode):
-        if score is not None:
-            self.score_label = pyglet.text.Label(text="Current Score: " + str(score),
-                                                 font_name='Times New Roman',
-                                                 font_size=score_label_font_size,
-                                                 x=0.5 * score_label_font_size,
-                                                 y=self.height - 1.1 * score_label_font_size,
-                                                 anchor_x='left', anchor_y='center',
-                                                 color=(100, 0, 0, 255),
-                                                 batch=main_batch)
+    def labels(self, main_batch, label_font_size, track_name, time, episode):
         if track_name is not None:
             self.track_label = pyglet.text.Label(text="Current Track:" + track_name,
                                                  font_name='Times New Roman',
-                                                 font_size=score_label_font_size * 0.5,
-                                                 x=0.5 * score_label_font_size,
-                                                 y=self.height - 2.2 * self.score_label.font_size,
+                                                 font_size=label_font_size * 0.5,
+                                                 x=0.5 * label_font_size,
+                                                 y=self.height - 1.2 * label_font_size,
                                                  anchor_x='left', anchor_y='center',
                                                  color=(100, 0, 100, 255),
                                                  batch=main_batch)
@@ -75,9 +65,9 @@ class Viewer():
         if time is not None:
             self.time_label = pyglet.text.Label(text="Current Episode Time:" + str(time),
                                                 font_name='Times New Roman',
-                                                font_size=score_label_font_size * 0.5,
-                                                x=0.5 * score_label_font_size,
-                                                y=self.height - 2.7 * self.score_label.font_size,
+                                                font_size=label_font_size * 0.5,
+                                                x=0.5 * label_font_size,
+                                                y=self.height - 1.8 * label_font_size,
                                                 anchor_x='left', anchor_y='center',
                                                 color=(100, 0, 100, 255),
                                                 batch=main_batch)
@@ -85,13 +75,13 @@ class Viewer():
         if episode is not None:
             self.episode_label = pyglet.text.Label(text="Current episode:" + str(episode),
                                                    font_name='Times New Roman',
-                                                   font_size=score_label_font_size * 0.5,
-                                                   x=0.5 * score_label_font_size,
-                                                   y=self.height - 3.2 * self.score_label.font_size,
+                                                   font_size=label_font_size * 0.5,
+                                                   x=0.5 * label_font_size,
+                                                   y=self.height - 2.4 * label_font_size,
                                                    anchor_x='left', anchor_y='center',
                                                    color=(100, 0, 100, 255),
                                                    batch=main_batch)
 
-        return self.score_label, self.track_label, self.time_label, self.episode_label
+        return self.track_label, self.time_label, self.episode_label
 
 

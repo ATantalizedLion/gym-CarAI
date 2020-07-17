@@ -122,7 +122,7 @@ class NodeManager():
         self.car_node = CarNode(self.batch, self)
 
     def export(self):
-        f = open('gym_carai/envs/resources/exported.csv', "w+")
+        f = open('exported.csv', "w+")
         x, y, rot = self.car_node.get_position()
         f.write("-1, {}, {}, {}, 0, 0\n".format(x, y, rot))  # write borders
         for group in self.group_list:
